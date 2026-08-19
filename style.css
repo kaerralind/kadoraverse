@@ -1,0 +1,207 @@
+/* =========================================
+   KADORAVERSE LORE VAULT
+   Main Styles
+   ========================================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f3f0;
+    color: #262626;
+}
+
+/* ---------- Header ---------- */
+
+.site-header {
+    height: 72px;
+    background: #ffffff;
+    border-bottom: 1px solid #ddd8d2;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 48px;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 3px;
+}
+
+.header-search input {
+    width: 220px;
+    padding: 10px 14px;
+
+    border: 1px solid #d5d0ca;
+    border-radius: 6px;
+
+    font-size: 14px;
+}
+
+/* ---------- Main ---------- */
+
+.home-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 70px 40px;
+}
+
+/* ---------- Hero ---------- */
+
+.hero {
+    text-align: center;
+    margin-bottom: 75px;
+}
+
+.hero h1 {
+    font-size: 48px;
+    letter-spacing: 5px;
+    margin-bottom: 12px;
+}
+
+.hero p {
+    font-size: 17px;
+    color: #77716b;
+    margin-bottom: 35px;
+}
+
+.main-search {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.main-search input {
+    width: 100%;
+    padding: 17px 20px;
+
+    border: 1px solid #d5d0ca;
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    font-size: 16px;
+}
+
+/* ---------- Sections ---------- */
+
+.recent-section {
+    margin-bottom: 45px;
+}
+
+.section-heading {
+    margin-bottom: 22px;
+}
+
+.section-heading h2 {
+    font-size: 22px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* ---------- Character Cards ---------- */
+
+.character-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+}
+
+.character-card {
+    border: 1px solid #ddd8d2;
+    background: #ffffff;
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    cursor: pointer;
+    text-align: left;
+
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.character-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.character-image {
+    height: 280px;
+
+    background: #e5e0da;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.character-image span {
+    font-size: 18px;
+    letter-spacing: 3px;
+    color: #77716b;
+}
+
+.character-name {
+    padding: 17px 18px;
+
+    font-size: 17px;
+    font-weight: 600;
+}
+
+/* ---------- Create Button ---------- */
+
+.create-section {
+    text-align: center;
+    margin-top: 50px;
+}
+
+.create-button {
+    border: none;
+    border-radius: 7px;
+
+    padding: 14px 24px;
+
+    background: #262626;
+    color: #ffffff;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.create-button:hover {
+    opacity: 0.85;
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 750px) {
+
+    .site-header {
+        padding: 0 20px;
+    }
+
+    .header-search {
+        display: none;
+    }
+
+    .home-page {
+        padding: 45px 20px;
+    }
+
+    .hero h1 {
+        font-size: 34px;
+    }
+
+    .character-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
