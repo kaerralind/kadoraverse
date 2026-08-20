@@ -3,74 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kadoraverse Lore Vault</title>
+    <title>Kadoraverse Character Vault</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <header class="site-header">
-        <div class="logo">KADORAVERSE</div>
+    <!-- =========================================
+         LOGIN PAGE
+         ========================================= -->
 
-        <div class="header-search">
-            <input type="text" placeholder="Search..." aria-label="Search">
+    <main id="login-page" class="login-page">
+
+        <div class="login-box">
+
+            <div class="login-logo">KADORAVERSE</div>
+
+            <h1>CHARACTER VAULT</h1>
+            <p>Sign in to access your universe.</p>
+
+            <form id="login-form">
+
+                <div class="form-field">
+                    <label for="login-email">Email</label>
+                    <input 
+                        type="email"
+                        id="login-email"
+                        autocomplete="email"
+                        required
+                    >
+                </div>
+
+                <div class="form-field">
+                    <label for="login-password">Password</label>
+                    <input 
+                        type="password"
+                        id="login-password"
+                        autocomplete="current-password"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="login-button">
+                    Log In
+                </button>
+
+                <p id="login-error" class="login-error"></p>
+
+            </form>
+
         </div>
-    </header>
-
-    <main class="home-page">
-
-        <section class="hero">
-            <h1>LORE VAULT</h1>
-            <p>Your universe, organized.</p>
-
-            <div class="main-search">
-                <input 
-                    type="text" 
-                    placeholder="Search characters, places, lore..."
-                    aria-label="Search Kadoraverse"
-                >
-            </div>
-        </section>
-
-        <section class="recent-section">
-            <div class="section-heading">
-                <h2>Recent Characters</h2>
-            </div>
-
-            <div class="character-grid">
-
-                <button class="character-card">
-                    <div class="character-image">
-                        <span>THERON</span>
-                    </div>
-                    <div class="character-name">Theron</div>
-                </button>
-
-                <button class="character-card">
-                    <div class="character-image">
-                        <span>CHERRY</span>
-                    </div>
-                    <div class="character-name">Cherry Kuro</div>
-                </button>
-
-                <button class="character-card">
-                    <div class="character-image">
-                        <span>FREY</span>
-                    </div>
-                    <div class="character-name">Frey</div>
-                </button>
-
-            </div>
-        </section>
-
-        <section class="create-section">
-            <button class="create-button">
-                + Create Character
-            </button>
-        </section>
 
     </main>
 
+
+    <!-- =========================================
+         CHARACTER VAULT HOME
+         ========================================= -->
+
+    <div id="app" class="app" hidden>
+
+        <header class="site-header">
+
+            <div class="logo">KADORAVERSE</div>
+
+            <div class="header-actions">
+
+                <div class="header-search">
+                    <input 
+                        type="text" 
+                        placeholder="Search..." 
+                        aria-label="Search"
+                    >
+                </div>
+
+                <button id="logout-button" class="logout-button">
+                    Log Out
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <main class="home-page">
+
+            <section class="hero">
+
+                <h1>CHARACTER VAULT</h1>
+
+                <p>Your universe, organized.</p>
+
+                <div class="main-search">
+
+                    <input 
+                        type="text" 
+                        placeholder="Search characters, places, lore..."
+                        aria-label="Search Kadoraverse"
+                    >
+
+                </div>
+
+            </section>
+
+
+            <section class="recent-section">
+
+                <div class="section-heading">
+                    <h2>Recent Characters</h2>
+                </div>
+
+                <div id="character-grid" class="character-grid">
+
+                    <!-- Characters will eventually be loaded from Supabase -->
+
+                </div>
+
+            </section>
+
+
+            <section class="create-section">
+
+                <button id="create-character-button" class="create-button">
+                    + Create Character
+                </button>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
     <script src="app.js"></script>
 
 </body>
