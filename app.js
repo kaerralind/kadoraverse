@@ -110,3 +110,105 @@ logoutButton.addEventListener("click", async function() {
 // ------------------------------------------------------------
 
 checkLogin();
+
+// ------------------------------------------------------------
+// START APPLICATION
+// ------------------------------------------------------------
+
+checkLogin();
+
+
+// ============================================================
+// CHARACTER CREATION NAVIGATION
+// ============================================================
+
+const createCharacterPage =
+    document.getElementById("create-character-page");
+
+const createCharacterButton =
+    document.getElementById("create-character-button");
+
+const backToVaultButton =
+    document.getElementById("back-to-vault");
+
+const cancelCharacterButton =
+    document.getElementById("cancel-character");
+
+
+// ------------------------------------------------------------
+// SHOW CHARACTER CREATION PAGE
+// ------------------------------------------------------------
+
+function showCreateCharacter() {
+
+    app.style.display = "none";
+
+    createCharacterPage.style.display = "block";
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+
+// ------------------------------------------------------------
+// RETURN TO CHARACTER VAULT
+// ------------------------------------------------------------
+
+function showCharacterVault() {
+
+    app.style.display = "block";
+
+    createCharacterPage.style.display = "none";
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+
+// ------------------------------------------------------------
+// CREATE CHARACTER BUTTON
+// ------------------------------------------------------------
+
+if (createCharacterButton) {
+
+    createCharacterButton.addEventListener("click", function() {
+
+        showCreateCharacter();
+
+    });
+
+}
+
+
+// ------------------------------------------------------------
+// BACK TO CHARACTER VAULT
+// ------------------------------------------------------------
+
+if (backToVaultButton) {
+
+    backToVaultButton.addEventListener("click", function() {
+
+        showCharacterVault();
+
+    });
+
+}
+
+
+// ------------------------------------------------------------
+// CANCEL CHARACTER
+// ------------------------------------------------------------
+
+if (cancelCharacterButton) {
+
+    cancelCharacterButton.addEventListener("click", function() {
+
+        showCharacterVault();
+
+    });
+
+}

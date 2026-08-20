@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Kadoraverse Character Vault</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -20,35 +22,56 @@
             <div class="login-logo">KADORAVERSE</div>
 
             <h1>CHARACTER VAULT</h1>
+
             <p>Sign in to access your universe.</p>
+
 
             <form id="login-form">
 
                 <div class="form-field">
-                    <label for="login-email">Email</label>
-                    <input 
+
+                    <label for="login-email">
+                        Email
+                    </label>
+
+                    <input
                         type="email"
                         id="login-email"
                         autocomplete="email"
                         required
                     >
+
                 </div>
 
+
                 <div class="form-field">
-                    <label for="login-password">Password</label>
-                    <input 
+
+                    <label for="login-password">
+                        Password
+                    </label>
+
+                    <input
                         type="password"
                         id="login-password"
                         autocomplete="current-password"
                         required
                     >
+
                 </div>
 
-                <button type="submit" class="login-button">
+
+                <button
+                    type="submit"
+                    class="login-button"
+                >
                     Log In
                 </button>
 
-                <p id="login-error" class="login-error"></p>
+
+                <p
+                    id="login-error"
+                    class="login-error"
+                ></p>
 
             </form>
 
@@ -65,19 +88,30 @@
 
         <header class="site-header">
 
-            <div class="logo">KADORAVERSE</div>
+            <div class="logo">
+                KADORAVERSE
+            </div>
+
 
             <div class="header-actions">
 
                 <div class="header-search">
-                    <input 
-                        type="text" 
-                        placeholder="Search..." 
+
+                    <input
+                        type="text"
+                        id="header-search"
+                        name="header_search"
+                        placeholder="Search..."
                         aria-label="Search"
                     >
+
                 </div>
 
-                <button id="logout-button" class="logout-button">
+
+                <button
+                    id="logout-button"
+                    class="logout-button"
+                >
                     Log Out
                 </button>
 
@@ -94,10 +128,13 @@
 
                 <p>Your universe, organized.</p>
 
+
                 <div class="main-search">
 
-                    <input 
-                        type="text" 
+                    <input
+                        type="text"
+                        id="main-search"
+                        name="main_search"
                         placeholder="Search characters, places, lore..."
                         aria-label="Search Kadoraverse"
                     >
@@ -110,10 +147,16 @@
             <section class="recent-section">
 
                 <div class="section-heading">
+
                     <h2>Recent Characters</h2>
+
                 </div>
 
-                <div id="character-grid" class="character-grid">
+
+                <div
+                    id="character-grid"
+                    class="character-grid"
+                >
 
                     <!-- Characters will eventually be loaded from Supabase -->
 
@@ -124,7 +167,10 @@
 
             <section class="create-section">
 
-                <button id="create-character-button" class="create-button">
+                <button
+                    id="create-character-button"
+                    class="create-button"
+                >
                     + Create Character
                 </button>
 
@@ -135,9 +181,518 @@
     </div>
 
 
-    <!-- Supabase -->
+    <!-- =========================================
+         CREATE CHARACTER
+         ========================================= -->
+
+    <main
+        id="create-character-page"
+        class="create-character-page"
+        style="display: none;"
+    >
+
+        <div class="create-character-header">
+
+            <button
+                id="back-to-vault"
+                class="back-button"
+            >
+                ← Back to Character Vault
+            </button>
+
+
+            <h1>Create Character</h1>
+
+            <p>
+                Create a new character for the Kadoraverse.
+            </p>
+
+        </div>
+
+
+        <form id="create-character-form">
+
+
+            <!-- ================================
+                 IDENTITY
+                 ================================ -->
+
+            <section class="form-section">
+
+                <h2>Identity</h2>
+
+
+                <div class="form-grid">
+
+                    <div class="form-field">
+
+                        <label for="first-name">
+                            First Name <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="first-name"
+                            name="first_name"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-field">
+
+                        <label for="last-name">
+                            Last Name <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="last-name"
+                            name="last_name"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-field">
+
+                        <label for="display-name">
+                            Display Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="display-name"
+                            name="display_name"
+                        >
+
+                    </div>
+
+
+                    <div class="form-field">
+
+                        <label for="aliases">
+                            Aliases
+                        </label>
+
+                        <input
+                            type="text"
+                            id="aliases"
+                            name="aliases"
+                        >
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================
+                 PROFILE IMAGE
+                 ================================ -->
+
+            <section class="form-section">
+
+                <h2>Profile Image</h2>
+
+
+                <div class="image-upload-area">
+
+                    <div
+                        id="image-preview"
+                        class="image-preview"
+                    >
+
+                        <span>No Image</span>
+
+                    </div>
+
+
+                    <div class="image-upload-controls">
+
+                        <label
+                            for="profile-image"
+                            class="image-upload-button"
+                        >
+                            Choose Image
+                        </label>
+
+
+                        <input
+                            type="file"
+                            id="profile-image"
+                            name="profile_image"
+                            accept="image/*"
+                            hidden
+                        >
+
+
+                        <button
+                            type="button"
+                            id="remove-image"
+                            class="remove-image-button"
+                            style="display: none;"
+                        >
+                            Remove Image
+                        </button>
+
+
+                        <p>
+                            JPG, PNG, GIF, or WebP
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================
+                 APPEARANCE
+                 ================================ -->
+
+            <section class="form-section">
+
+                <h2>Appearance</h2>
+
+
+                <div class="form-grid">
+
+                    <div class="form-field">
+
+                        <label for="gender">
+                            Gender
+                        </label>
+
+                        <input
+                            type="text"
+                            id="gender"
+                            name="gender"
+                        >
+
+                    </div>
+
+
+                    <div class="form-field">
+
+                        <label for="species">
+                            Species
+                        </label>
+
+                        <input
+                            type="text"
+                            id="species"
+                            name="species"
+                        >
+
+                    </div>
+
+
+                    <div class="form-field">
+
+                        <label for="height">
+                            Height
+                        </label>
+
+                        <input
+                            type="text"
+                            id="height"
+                            name="height"
+                            placeholder="e.g. 5'11&quot;"
+                        >
+
+                    </div>
+
+
+                    <div class="form-field">
+
+                        <label for="hair-colour">
+                            Hair Colour
+                        </label>
+
+                        <input
+                            type="text"
+                            id="hair-colour"
+                            name="hair_colour"
+                        >
+
+                    </div>
+
+
+                    <div class="form-field">
+
+                        <label for="eye-colour">
+                            Eye Colour
+                        </label>
+
+                        <input
+                            type="text"
+                            id="eye-colour"
+                            name="eye_colour"
+                        >
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================
+                 DATES & PLACES
+                 ================================ -->
+
+            <section class="form-section">
+
+                <h2>Dates & Places</h2>
+
+
+                <div class="form-grid">
+
+                    <div class="form-field">
+
+                        <label for="birth-month">
+                            Birth Month
+                        </label>
+
+                        <input
+                            type="number"
+                            id="birth-month"
+                            name="birth_month"
+                            min="1"
+                            max="12"
+                            placeholder="MM"
+                        >
+
+                    </div>
+
+
+                    <div class="form-field">
+
+                        <label for="birth-day">
+                            Birth Day
+                        </label>
+
+                        <input
+                            type="number"
+                            id="birth-day"
+                            name="birth_day"
+                            min="1"
+                            max="31"
+                            placeholder="DD"
+                        >
+
+                    </div>
+
+
+                    <div class="form-field">
+
+                        <label for="birth-year">
+                            Birth Year
+                        </label>
+
+                        <input
+                            type="number"
+                            id="birth-year"
+                            name="birth_year"
+                            min="1"
+                            placeholder="YYYY"
+                        >
+
+                    </div>
+
+
+                    <div class="form-field">
+
+                        <label for="zodiac-sign">
+                            Zodiac Sign
+                        </label>
+
+                        <input
+                            type="text"
+                            id="zodiac-sign"
+                            name="zodiac_sign"
+                        >
+
+                    </div>
+
+
+                    <div class="form-field full-width">
+
+                        <label for="birth-place">
+                            Birth Place
+                        </label>
+
+                        <input
+                            type="text"
+                            id="birth-place"
+                            name="birth_place"
+                        >
+
+                    </div>
+
+
+                    <div class="form-field full-width">
+
+                        <label for="residence">
+                            Residence
+                        </label>
+
+                        <input
+                            type="text"
+                            id="residence"
+                            name="residence"
+                        >
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================
+                 OCCUPATION
+                 ================================ -->
+
+            <section class="form-section">
+
+                <h2>Occupation</h2>
+
+
+                <div class="form-grid">
+
+                    <div class="form-field">
+
+                        <label for="occupation">
+                            Occupation
+                        </label>
+
+                        <input
+                            type="text"
+                            id="occupation"
+                            name="occupation"
+                        >
+
+                    </div>
+
+
+                    <div class="form-field">
+
+                        <label for="affiliations">
+                            Affiliations
+                        </label>
+
+                        <input
+                            type="text"
+                            id="affiliations"
+                            name="affiliations"
+                        >
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================
+                 FAMILY
+                 ================================ -->
+
+            <section class="form-section">
+
+                <h2>Family</h2>
+
+
+                <div class="form-grid">
+
+                    <div class="form-field">
+
+                        <label for="marital-status">
+                            Marital Status
+                        </label>
+
+                        <input
+                            type="text"
+                            id="marital-status"
+                            name="marital_status"
+                        >
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================
+                 PROFILE
+                 ================================ -->
+
+            <section class="form-section">
+
+                <h2>Profile</h2>
+
+
+                <p class="section-description">
+                    Dump whatever you know about this character here.
+                    You can organize it later.
+                </p>
+
+
+                <div id="profile-editor"></div>
+
+            </section>
+
+
+            <!-- ================================
+                 FORM ACTIONS
+                 ================================ -->
+
+            <div class="form-actions">
+
+                <button
+                    type="button"
+                    id="cancel-character"
+                    class="cancel-button"
+                >
+                    Cancel
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="save-character-button"
+                >
+                    Create Character
+                </button>
+
+            </div>
+
+
+            <p
+                id="character-form-error"
+                class="form-error"
+            ></p>
+
+        </form>
+
+    </main>
+
+
+    <!-- =========================================
+         SCRIPTS
+         ========================================= -->
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script src="supabase.js"></script>
+
     <script src="app.js"></script>
 
 </body>
