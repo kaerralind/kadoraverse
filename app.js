@@ -29,6 +29,10 @@ const profileImageInput = document.getElementById("profile-image");
 const imagePreview = document.getElementById("image-preview");
 const removeImageButton = document.getElementById("remove-image");
 
+// Gender
+const genderSelect = document.getElementById("gender");
+const genderSymbol = document.getElementById("gender-symbol");
+
 // Cropper
 const cropperModal = document.getElementById("image-cropper-modal");
 const cropperImage = document.getElementById("cropper-image");
@@ -45,7 +49,6 @@ const cropperApply = document.getElementById("cropper-apply");
 let cropper = null;
 let selectedImageURL = null;
 let croppedImageBlob = null;
-
 
 // ------------------------------------------------------------
 // SHOW / HIDE APPLICATION
@@ -580,6 +583,34 @@ removeImageButton.addEventListener(
 // CHARACTER FORM
 // ============================================================
 
+// ------------------------------------------------------------
+// GENDER SYMBOLS
+// ------------------------------------------------------------
+
+const genderSymbols = {
+    Alpha: "α",
+    Sigma: "Σ",
+    Beta: "β",
+    Zeta: "ζ",
+    Omega: "ω",
+    Omicron: "ο",
+    Tau: "τ"
+};
+
+
+genderSelect.addEventListener(
+    "change",
+    function() {
+
+        const selectedGender =
+            this.value;
+
+        genderSymbol.textContent =
+            genderSymbols[selectedGender] || "—";
+
+    }
+);
+
 
 // ------------------------------------------------------------
 // CREATE CHARACTER FORM
@@ -626,7 +657,6 @@ createCharacterForm.addEventListener(
             return;
 
         }
-
 
         // ----------------------------------------------------
         // GET ALL FORM VALUES
