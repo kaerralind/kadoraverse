@@ -24,6 +24,11 @@ const backToVaultButton = document.getElementById("back-to-vault");
 const cancelCharacterButton = document.getElementById("cancel-character");
 const createCharacterForm = document.getElementById("create-character-form");
 
+// Relationship / partner elements
+const partnerSection = document.getElementById("partner-section");
+const partnersContainer = document.getElementById("partners-container");
+const addPartnerButton = document.getElementById("add-partner");
+
 // Character image
 const profileImageInput = document.getElementById("profile-image");
 const imagePreview = document.getElementById("image-preview");
@@ -43,12 +48,16 @@ const cropperApply = document.getElementById("cropper-apply");
 
 
 // ------------------------------------------------------------
-// CROPPIER STATE
+// CROPPER / DRAFT STATE
 // ------------------------------------------------------------
 
 let cropper = null;
 let selectedImageURL = null;
 let croppedImageBlob = null;
+
+let currentCharacterId = null;
+let autosaveInterval = null;
+
 
 // ------------------------------------------------------------
 // SHOW / HIDE APPLICATION
@@ -58,8 +67,8 @@ function showApp() {
 
     loginPage.style.display = "none";
     app.style.display = "block";
-
     createCharacterPage.style.display = "none";
+
 }
 
 
@@ -72,6 +81,9 @@ function showLogin() {
     loginPage.style.display = "flex";
     app.style.display = "none";
     createCharacterPage.style.display = "none";
+
+    stopCharacterDraftAutosave();
+
 }
 
 
@@ -81,13 +93,22 @@ function showLogin() {
 
 function showCreateCharacter() {
 
+    loginPage.style.display = "none";
     app.style.display = "none";
     createCharacterPage.style.display = "block";
+
+    localStorage.setItem(
+        "kadoraverse_current_page",
+        "create-character"
+    );
+
+    startCharacterDraftAutosave();
 
     window.scrollTo({
         top: 0,
         behavior: "smooth"
     });
+
 }
 
 
@@ -97,14 +118,396 @@ function showCreateCharacter() {
 
 function showVault() {
 
+    loginPage.style.display = "none";
     createCharacterPage.style.display = "none";
     app.style.display = "block";
+
+    localStorage.setItem(
+        "kadoraverse_current_page",
+        "vault"
+    );
+
+    stopCharacterDraftAutosave();
 
     window.scrollTo({
         top: 0,
         behavior: "smooth"
     });
+
 }
+
+
+// ============================================================
+// CHARACTER DRAFT AUTOSAVE
+// ============================================================
+
+
+// ------------------------------------------------------------
+// START CHARACTER DRAFT AUTOSAVE
+// ------------------------------------------------------------
+
+function startCharacterDraftAutosave() {
+
+    // Prevent duplicate timers
+    if (autosaveInterval) {
+
+        clearInterval(
+            autosaveInterval
+        );
+
+    }
+
+    // Autosave every 30 seconds
+    autosaveInterval =
+        setInterval(
+            saveCharacterDraft,
+            30 * 1000
+        );
+
+    console.log(
+        "Character draft autosave started."
+    );
+
+}
+
+
+// ------------------------------------------------------------
+// STOP CHARACTER DRAFT AUTOSAVE
+// ------------------------------------------------------------
+
+function stopCharacterDraftAutosave() {
+
+    if (autosaveInterval) {
+
+        clearInterval(
+            autosaveInterval
+        );
+
+        autosaveInterval = null;
+
+    }
+
+    console.log(
+        "Character draft autosave stopped."
+    );
+
+}
+
+
+// ------------------------------------------------------------
+// SAVE CHARACTER DRAFT
+// ------------------------------------------------------------
+
+async function saveCharacterDraft() {
+
+    // Don't autosave if the creation page isn't visible
+    if (
+        createCharacterPage.style.display === "none"
+    ) {
+
+        return;
+
+    }
+
+
+    // --------------------------------------------------------
+    // GET REQUIRED NAME FIELDS
+    // --------------------------------------------------------
+
+    const firstName =
+        document.getElementById(
+            "first-name"
+        ).value.trim();
+
+    const lastName =
+        document.getElementById(
+            "last-name"
+        ).value.trim();
+
+
+    // Don't create a database row until we have a name
+    if (!firstName || !lastName) {
+
+        console.log(
+            "Draft autosave skipped: first and last name are required."
+        );
+
+        return;
+
+    }
+
+
+    // --------------------------------------------------------
+    // GET FORM VALUES
+    // --------------------------------------------------------
+
+    const displayName =
+        document.getElementById(
+            "display-name"
+        ).value.trim() || null;
+
+
+    const aliases =
+        document.getElementById(
+            "aliases"
+        ).value.trim() || null;
+
+
+    const gender =
+        document.getElementById(
+            "gender"
+        ).value.trim() || null;
+
+
+    const species =
+        document.getElementById(
+            "species"
+        ).value.trim() || null;
+
+
+    const height =
+        document.getElementById(
+            "height"
+        ).value.trim() || null;
+
+
+    const hairColor =
+        document.getElementById(
+            "hair-color"
+        ).value.trim() || null;
+
+
+    const eyeColor =
+        document.getElementById(
+            "eye-color"
+        ).value.trim() || null;
+
+
+    const birthMonth =
+        document.getElementById(
+            "birth-month"
+        ).value;
+
+
+    const birthDay =
+        document.getElementById(
+            "birth-day"
+        ).value;
+
+
+    const birthYear =
+        document.getElementById(
+            "birth-year"
+        ).value;
+
+
+    const zodiacSign =
+        document.getElementById(
+            "zodiac-sign"
+        ).value.trim() || null;
+
+
+    const birthPlace =
+        document.getElementById(
+            "birth-place"
+        ).value.trim() || null;
+
+
+    const residence =
+        document.getElementById(
+            "residence"
+        ).value.trim() || null;
+
+
+    const occupation =
+        document.getElementById(
+            "occupation"
+        ).value.trim() || null;
+
+
+    const affiliations =
+        document.getElementById(
+            "affiliations"
+        ).value.trim() || null;
+
+
+    const maritalStatus =
+        document.getElementById(
+            "marital-status"
+        ).value.trim() || null;
+
+
+    // --------------------------------------------------------
+    // BUILD DATE OF BIRTH
+    // --------------------------------------------------------
+
+    let dateOfBirth = null;
+
+
+    if (
+        birthMonth &&
+        birthDay &&
+        birthYear
+    ) {
+
+        const month =
+            String(birthMonth).padStart(
+                2,
+                "0"
+            );
+
+        const day =
+            String(birthDay).padStart(
+                2,
+                "0"
+            );
+
+
+        dateOfBirth =
+            `${birthYear}-${month}-${day}`;
+
+    }
+
+
+    // --------------------------------------------------------
+    // BUILD CHARACTER DATA
+    // --------------------------------------------------------
+
+    const characterData = {
+
+        first_name: firstName,
+
+        last_name: lastName,
+
+        display_name: displayName,
+
+        aliases: aliases,
+
+        gender: gender,
+
+        species: species,
+
+        height: height,
+
+        hair_color: hairColor,
+
+        eye_color: eyeColor,
+
+        date_of_birth: dateOfBirth,
+
+        zodiac_sign: zodiacSign,
+
+        birth_place: birthPlace,
+
+        residence: residence,
+
+        occupation: occupation,
+
+        affiliations: affiliations,
+
+        marital_status: maritalStatus,
+
+        profile_status: "draft"
+
+    };
+
+
+    try {
+
+        // ====================================================
+        // UPDATE EXISTING DRAFT
+        // ====================================================
+
+        if (currentCharacterId) {
+
+            const {
+                error
+            } = await supabaseClient
+                .from("characters")
+                .update(characterData)
+                .eq(
+                    "id",
+                    currentCharacterId
+                );
+
+
+            if (error) {
+
+                console.error(
+                    "Draft autosave update error:",
+                    error
+                );
+
+                return;
+
+            }
+
+
+            console.log(
+                "Character draft autosaved."
+            );
+
+            return;
+
+        }
+
+
+        // ====================================================
+        // CREATE NEW DRAFT
+        // ====================================================
+
+        const {
+            data,
+            error
+        } = await supabaseClient
+            .from("characters")
+            .insert(
+                characterData
+            )
+            .select("id")
+            .single();
+
+
+        if (error) {
+
+            console.error(
+                "Draft autosave creation error:",
+                error
+            );
+
+            return;
+
+        }
+
+
+        // Store the database ID.
+        // Every future autosave will UPDATE
+        // this same row.
+
+        currentCharacterId =
+            data.id;
+
+
+        console.log(
+            "Character draft created:",
+            currentCharacterId
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Character draft autosave failed:",
+            error
+        );
+
+    }
+
+}
+
+
+// ============================================================
+// LOGIN SESSION
+// ============================================================
 
 
 // ------------------------------------------------------------
@@ -113,31 +516,64 @@ function showVault() {
 
 async function checkLogin() {
 
-    const { data, error } =
+    const {
+        data,
+        error
+    } =
         await supabaseClient.auth.getSession();
+
 
     if (error) {
 
-        console.error("Session error:", error);
+        console.error(
+            "Session error:",
+            error
+        );
 
         showLogin();
 
         return;
+
     }
+
 
     if (data.session) {
 
-        console.log("User is logged in.");
+        console.log(
+            "User is logged in."
+        );
 
-        showApp();
+
+        const currentPage =
+            localStorage.getItem(
+                "kadoraverse_current_page"
+            );
+
+
+        if (
+            currentPage ===
+            "create-character"
+        ) {
+
+            showCreateCharacter();
+
+        } else {
+
+            showApp();
+
+        }
+
 
     } else {
 
-        console.log("No active session.");
+        console.log(
+            "No active session."
+        );
 
         showLogin();
 
     }
+
 }
 
 
@@ -145,74 +581,112 @@ async function checkLogin() {
 // LOGIN
 // ------------------------------------------------------------
 
-loginForm.addEventListener("submit", async function(event) {
+loginForm.addEventListener(
+    "submit",
+    async function(event) {
 
-    event.preventDefault();
+        event.preventDefault();
 
-    loginError.textContent = "";
-
-    const email =
-        document.getElementById("login-email").value;
-
-    const password =
-        document.getElementById("login-password").value;
+        loginError.textContent = "";
 
 
-    const { data, error } =
-        await supabaseClient.auth.signInWithPassword({
-
-            email: email,
-            password: password
-
-        });
+        const email =
+            document.getElementById(
+                "login-email"
+            ).value;
 
 
-    if (error) {
+        const password =
+            document.getElementById(
+                "login-password"
+            ).value;
 
-        console.error("Login error:", error);
 
-        loginError.textContent =
-            "Incorrect email or password.";
+        const {
+            data,
+            error
+        } =
+            await supabaseClient.auth.signInWithPassword({
 
-        return;
+                email: email,
+
+                password: password
+
+            });
+
+
+        if (error) {
+
+            console.error(
+                "Login error:",
+                error
+            );
+
+            loginError.textContent =
+                "Incorrect email or password.";
+
+            return;
+
+        }
+
+
+        console.log(
+            "Successfully logged in:",
+            data.user
+        );
+
+
+        showApp();
+
     }
-
-
-    console.log(
-        "Successfully logged in:",
-        data.user
-    );
-
-
-    showApp();
-
-});
+);
 
 
 // ------------------------------------------------------------
 // LOG OUT
 // ------------------------------------------------------------
 
-logoutButton.addEventListener("click", async function() {
+logoutButton.addEventListener(
+    "click",
+    async function() {
 
-    const { error } =
-        await supabaseClient.auth.signOut();
-
-
-    if (error) {
-
-        console.error(
-            "Logout error:",
+        const {
             error
+        } =
+            await supabaseClient.auth.signOut();
+
+
+        if (error) {
+
+            console.error(
+                "Logout error:",
+                error
+            );
+
+            return;
+
+        }
+
+
+        // Forget the current page
+        localStorage.removeItem(
+            "kadoraverse_current_page"
         );
 
-        return;
+
+        // Reset draft state
+        currentCharacterId = null;
+
+
+        showLogin();
+
     }
+);
 
 
-    showLogin();
-
-});
+// ============================================================
+// CHARACTER NAVIGATION
+// ============================================================
 
 
 // ------------------------------------------------------------
@@ -223,6 +697,9 @@ createCharacterButton.addEventListener(
     "click",
     function() {
 
+        // Start a fresh character
+        currentCharacterId = null;
+
         showCreateCharacter();
 
     }
@@ -230,7 +707,7 @@ createCharacterButton.addEventListener(
 
 
 // ------------------------------------------------------------
-// BACK TO VAULT
+// BACK TO CHARACTER VAULT
 // ------------------------------------------------------------
 
 backToVaultButton.addEventListener(
@@ -270,46 +747,64 @@ profileImageInput.addEventListener(
     "change",
     function(event) {
 
-        const file = event.target.files[0];
+        const file =
+            event.target.files[0];
+
 
         if (!file) {
+
             return;
+
         }
 
 
         // Make sure the selected file is an image
-        if (!file.type.startsWith("image/")) {
+        if (
+            !file.type.startsWith(
+                "image/"
+            )
+        ) {
 
-            alert("Please select an image file.");
+            alert(
+                "Please select an image file."
+            );
 
             profileImageInput.value = "";
 
             return;
+
         }
 
 
-        // Clean up an old object URL if one exists
+        // Clean up an old object URL
         if (selectedImageURL) {
 
-            URL.revokeObjectURL(selectedImageURL);
+            URL.revokeObjectURL(
+                selectedImageURL
+            );
 
         }
 
 
         selectedImageURL =
-            URL.createObjectURL(file);
+            URL.createObjectURL(
+                file
+            );
 
 
         // Put the image into the cropper
-        cropperImage.src = selectedImageURL;
+        cropperImage.src =
+            selectedImageURL;
 
 
         // Show cropper
-        cropperModal.style.display = "flex";
+        cropperModal.style.display =
+            "flex";
 
 
-        // Reset zoom slider
-        cropperZoom.value = "1";
+        // Reset zoom
+        cropperZoom.value =
+            "1";
 
 
         // Destroy previous Cropper instance
@@ -323,51 +818,69 @@ profileImageInput.addEventListener(
 
 
         // Wait for image to load
-        cropperImage.onload = function() {
+        cropperImage.onload =
+            function() {
 
-            cropper = new Cropper(
-                cropperImage,
-                {
+                cropper =
+                    new Cropper(
+                        cropperImage,
+                        {
 
-                    // Fixed character-image ratio
-                    aspectRatio: 3 / 4,
+                            aspectRatio:
+                                3 / 4,
 
-                    viewMode: 1,
+                            viewMode:
+                                1,
 
-                    dragMode: "move",
+                            dragMode:
+                                "move",
 
-                    autoCropArea: 1,
+                            autoCropArea:
+                                1,
 
-                    responsive: true,
+                            responsive:
+                                true,
 
-                    restore: false,
+                            restore:
+                                false,
 
-                    guides: false,
+                            guides:
+                                false,
 
-                    center: true,
+                            center:
+                                true,
 
-                    highlight: false,
+                            highlight:
+                                false,
 
-                    background: false,
+                            background:
+                                false,
 
-                    movable: true,
+                            movable:
+                                true,
 
-                    zoomable: true,
+                            zoomable:
+                                true,
 
-                    rotatable: false,
+                            rotatable:
+                                false,
 
-                    scalable: false,
+                            scalable:
+                                false,
 
-                    cropBoxMovable: false,
+                            cropBoxMovable:
+                                false,
 
-                    cropBoxResizable: false,
+                            cropBoxResizable:
+                                false,
 
-                    toggleDragModeOnDblclick: false
+                            toggleDragModeOnDblclick:
+                                false
 
-                }
-            );
+                        }
+                    );
 
-        };
+            };
 
     }
 );
@@ -382,15 +895,21 @@ cropperZoom.addEventListener(
     function() {
 
         if (!cropper) {
+
             return;
+
         }
 
 
         const zoomValue =
-            parseFloat(this.value);
+            parseFloat(
+                this.value
+            );
 
 
-        cropper.zoomTo(zoomValue);
+        cropper.zoomTo(
+            zoomValue
+        );
 
     }
 );
@@ -405,13 +924,16 @@ cropperReset.addEventListener(
     function() {
 
         if (!cropper) {
+
             return;
+
         }
 
 
         cropper.reset();
 
-        cropperZoom.value = "1";
+        cropperZoom.value =
+            "1";
 
     }
 );
@@ -427,8 +949,8 @@ cropperCancel.addEventListener(
 
         closeCropper();
 
-        // Clear selected file
-        profileImageInput.value = "";
+        profileImageInput.value =
+            "";
 
     }
 );
@@ -443,20 +965,24 @@ cropperApply.addEventListener(
     function() {
 
         if (!cropper) {
+
             return;
+
         }
 
 
-        // Get the cropped canvas
         const canvas =
             cropper.getCroppedCanvas({
 
                 width: 600,
+
                 height: 800,
 
-                imageSmoothingEnabled: true,
+                imageSmoothingEnabled:
+                    true,
 
-                imageSmoothingQuality: "high"
+                imageSmoothingQuality:
+                    "high"
 
             });
 
@@ -468,22 +994,33 @@ cropperApply.addEventListener(
             );
 
             return;
+
         }
 
 
-        // Show the cropped image immediately
+        // ----------------------------------------------------
+        // SHOW PREVIEW
+        // ----------------------------------------------------
+
         const previewURL =
-            canvas.toDataURL("image/png");
+            canvas.toDataURL(
+                "image/png"
+            );
 
 
-        imagePreview.innerHTML = "";
+        imagePreview.innerHTML =
+            "";
 
 
         const previewImage =
-            document.createElement("img");
+            document.createElement(
+                "img"
+            );
 
 
-        previewImage.src = previewURL;
+        previewImage.src =
+            previewURL;
+
 
         previewImage.alt =
             "Character profile image";
@@ -494,13 +1031,15 @@ cropperApply.addEventListener(
         );
 
 
-        // Convert canvas to a Blob.
-        // This is what we'll eventually upload
-        // to Supabase Storage.
+        // ----------------------------------------------------
+        // CONVERT TO BLOB
+        // ----------------------------------------------------
+
         canvas.toBlob(
             function(blob) {
 
-                croppedImageBlob = blob;
+                croppedImageBlob =
+                    blob;
 
             },
             "image/png"
@@ -524,7 +1063,8 @@ cropperApply.addEventListener(
 
 function closeCropper() {
 
-    cropperModal.style.display = "none";
+    cropperModal.style.display =
+        "none";
 
 
     if (cropper) {
@@ -536,10 +1076,13 @@ function closeCropper() {
     }
 
 
-    cropperImage.removeAttribute("src");
+    cropperImage.removeAttribute(
+        "src"
+    );
 
 
-    cropperZoom.value = "1";
+    cropperZoom.value =
+        "1";
 
 
     if (selectedImageURL) {
@@ -548,7 +1091,8 @@ function closeCropper() {
             selectedImageURL
         );
 
-        selectedImageURL = null;
+        selectedImageURL =
+            null;
 
     }
 
@@ -563,9 +1107,12 @@ removeImageButton.addEventListener(
     "click",
     function() {
 
-        croppedImageBlob = null;
+        croppedImageBlob =
+            null;
 
-        profileImageInput.value = "";
+
+        profileImageInput.value =
+            "";
 
 
         imagePreview.innerHTML =
@@ -583,18 +1130,27 @@ removeImageButton.addEventListener(
 // CHARACTER FORM
 // ============================================================
 
+
 // ------------------------------------------------------------
 // GENDER SYMBOLS
 // ------------------------------------------------------------
 
 const genderSymbols = {
+
     Alpha: "α",
+
     Sigma: "Σ",
+
     Beta: "β",
+
     Zeta: "ζ",
+
     Omega: "ω",
+
     Omicron: "ο",
+
     Tau: "τ"
+
 };
 
 
@@ -605,11 +1161,150 @@ genderSelect.addEventListener(
         const selectedGender =
             this.value;
 
+
         genderSymbol.textContent =
-            genderSymbols[selectedGender] || "—";
+            genderSymbols[
+                selectedGender
+            ] || "—";
 
     }
 );
+
+// ------------------------------------------------------------
+// CHARACTER RELATIONSHIPS
+// ------------------------------------------------------------
+
+const partnerRelationshipStatuses = [
+    "Dating",
+    "Engaged",
+    "Married",
+    "Mated",
+    "Separated",
+    "Divorced",
+    "Widowed",
+    "Open Relationship",
+    "It's Complicated"
+];
+
+
+// ------------------------------------------------------------
+// SHOW / HIDE PARTNER SECTION
+// ------------------------------------------------------------
+
+function updatePartnerSectionVisibility() {
+
+    partnerSection.style.display = "block";
+
+}
+
+
+// ------------------------------------------------------------
+// ADD PARTNER
+// ------------------------------------------------------------
+
+function addPartner() {
+
+    const partnerEntry =
+        document.createElement("div");
+
+    partnerEntry.className =
+        "partner-entry";
+
+
+    partnerEntry.innerHTML = `
+
+        <div class="form-grid">
+
+            <div class="form-field">
+
+                <label>
+                    Partner
+                </label>
+
+                <input
+                    type="text"
+                    class="partner-name"
+                    placeholder="Character name"
+                >
+
+            </div>
+
+
+            <div class="form-field">
+
+                <label>
+                    Relationship Status
+                </label>
+
+                <select
+                    class="partner-status"
+                >
+
+                    <option value="">
+                        Select...
+                    </option>
+
+                    ${partnerRelationshipStatuses.map(
+                        status =>
+                            `<option value="${status}">${status}</option>`
+                    ).join("")}
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <button
+            type="button"
+            class="remove-partner-button"
+        >
+            Remove Partner
+        </button>
+
+    `;
+
+
+    partnersContainer.appendChild(
+        partnerEntry
+    );
+
+
+    const removeButton =
+        partnerEntry.querySelector(
+            ".remove-partner-button"
+        );
+
+
+    removeButton.addEventListener(
+        "click",
+        function() {
+
+            partnerEntry.remove();
+
+        }
+    );
+
+}
+
+
+// ------------------------------------------------------------
+// ADD PARTNER BUTTON
+// ------------------------------------------------------------
+
+addPartnerButton.addEventListener(
+    "click",
+    function() {
+
+        addPartner();
+
+    }
+);
+
+// ============================================================
+// CREATE / SAVE CHARACTER
+// ============================================================
 
 
 // ------------------------------------------------------------
@@ -622,12 +1317,15 @@ createCharacterForm.addEventListener(
 
         event.preventDefault();
 
+
         const errorElement =
             document.getElementById(
                 "character-form-error"
             );
 
-        errorElement.textContent = "";
+
+        errorElement.textContent =
+            "";
 
 
         // ----------------------------------------------------
@@ -639,6 +1337,7 @@ createCharacterForm.addEventListener(
                 "first-name"
             ).value.trim();
 
+
         const lastName =
             document.getElementById(
                 "last-name"
@@ -649,7 +1348,10 @@ createCharacterForm.addEventListener(
         // VALIDATE REQUIRED FIELDS
         // ----------------------------------------------------
 
-        if (!firstName || !lastName) {
+        if (
+            !firstName ||
+            !lastName
+        ) {
 
             errorElement.textContent =
                 "First Name and Last Name are required.";
@@ -657,6 +1359,7 @@ createCharacterForm.addEventListener(
             return;
 
         }
+
 
         // ----------------------------------------------------
         // GET ALL FORM VALUES
@@ -772,10 +1475,21 @@ createCharacterForm.addEventListener(
         ) {
 
             const month =
-                String(birthMonth).padStart(2, "0");
+                String(
+                    birthMonth
+                ).padStart(
+                    2,
+                    "0"
+                );
+
 
             const day =
-                String(birthDay).padStart(2, "0");
+                String(
+                    birthDay
+                ).padStart(
+                    2,
+                    "0"
+                );
 
 
             dateOfBirth =
@@ -798,61 +1512,253 @@ createCharacterForm.addEventListener(
             saveButton.textContent;
 
 
-        saveButton.disabled = true;
+        saveButton.disabled =
+            true;
+
 
         saveButton.textContent =
-            "Creating Character...";
+            "Saving Character...";
 
 
         try {
 
+            // =================================================
+            // CHARACTER DATA
+            // =================================================
+
+            const characterData = {
+
+                first_name:
+                    firstName,
+
+                last_name:
+                    lastName,
+
+                display_name:
+                    displayName,
+
+                aliases:
+                    aliases,
+
+                gender:
+                    gender,
+
+                species:
+                    species,
+
+                height:
+                    height,
+
+                hair_color:
+                    hairColor,
+
+                eye_color:
+                    eyeColor,
+
+                date_of_birth:
+                    dateOfBirth,
+
+                zodiac_sign:
+                    zodiacSign,
+
+                birth_place:
+                    birthPlace,
+
+                residence:
+                    residence,
+
+                occupation:
+                    occupation,
+
+                affiliations:
+                    affiliations,
+
+                marital_status:
+                    maritalStatus,
+
+                profile_status:
+                    "draft"
+
+            };
+
 
             // =================================================
-            // 1. CHECK FOR EXISTING CHARACTER
+            // 1. HANDLE EXISTING AUTOSAVED DRAFT
             // =================================================
 
-            const {
-                data: existingCharacter,
-                error: existingCharacterError
-            } = await supabaseClient
-                .from("characters")
-                .select("id")
-                .eq("first_name", firstName)
-                .eq("last_name", lastName)
-                .maybeSingle();
+            if (currentCharacterId) {
+
+                const {
+                    data: updatedCharacter,
+                    error:
+                        characterUpdateError
+                } =
+                    await supabaseClient
+                        .from("characters")
+                        .update(
+                            characterData
+                        )
+                        .eq(
+                            "id",
+                            currentCharacterId
+                        )
+                        .select()
+                        .single();
 
 
-            if (existingCharacterError) {
+                if (
+                    characterUpdateError
+                ) {
 
-                console.error(
-                    "Character lookup error:",
+                    console.error(
+                        "Character update error:",
+                        characterUpdateError
+                    );
+
+                    throw new Error(
+                        "The character could not be saved."
+                    );
+
+                }
+
+
+                console.log(
+                    "Autosaved character updated:",
+                    updatedCharacter
+                );
+
+            }
+
+
+            // =================================================
+            // 2. CHECK FOR EXISTING CHARACTER
+            // =================================================
+            //
+            // Only perform the duplicate-name check when
+            // there is NOT already an autosaved draft.
+            //
+            // =================================================
+
+            else {
+
+                const {
+                    data:
+                        existingCharacter,
+                    error:
+                        existingCharacterError
+                } =
+                    await supabaseClient
+                        .from("characters")
+                        .select("id")
+                        .eq(
+                            "first_name",
+                            firstName
+                        )
+                        .eq(
+                            "last_name",
+                            lastName
+                        )
+                        .maybeSingle();
+
+
+                if (
                     existingCharacterError
-                );
+                ) {
 
-                throw new Error(
-                    "Could not check whether this character already exists."
-                );
+                    console.error(
+                        "Character lookup error:",
+                        existingCharacterError
+                    );
 
-            }
+                    throw new Error(
+                        "Could not check whether this character already exists."
+                    );
+
+                }
 
 
-            if (existingCharacter) {
+                if (
+                    existingCharacter
+                ) {
 
-                throw new Error(
-                    `${firstName} ${lastName} already exists in the Character Vault.`
+                    throw new Error(
+                        `${firstName} ${lastName} already exists in the Character Vault.`
+                    );
+
+                }
+
+
+                // ---------------------------------------------
+                // CREATE CHARACTER
+                // ---------------------------------------------
+
+                const {
+                    data: newCharacter,
+                    error:
+                        characterInsertError
+                } =
+                    await supabaseClient
+                        .from("characters")
+                        .insert(
+                            characterData
+                        )
+                        .select()
+                        .single();
+
+
+                if (
+                    characterInsertError
+                ) {
+
+                    console.error(
+                        "Character creation error:",
+                        characterInsertError
+                    );
+
+
+                    if (
+                        characterInsertError.code ===
+                        "23505"
+                    ) {
+
+                        throw new Error(
+                            `${firstName} ${lastName} already exists in the Character Vault.`
+                        );
+
+                    }
+
+
+                    throw new Error(
+                        "The character could not be created."
+                    );
+
+                }
+
+
+                currentCharacterId =
+                    newCharacter.id;
+
+
+                console.log(
+                    "Character created:",
+                    newCharacter
                 );
 
             }
 
 
             // =================================================
-            // 2. UPLOAD PROFILE IMAGE
+            // 3. PROFILE IMAGE
+            // =================================================
+            //
+            // Images are uploaded after the character exists
+            // so we have the character ID available.
+            //
             // =================================================
 
-            let profileImageURL = null;
-
-
-            if (croppedImageBlob) {
+            if (
+                croppedImageBlob
+            ) {
 
                 const imageFileName =
                     `${firstName} ${lastName}.png`;
@@ -868,16 +1774,26 @@ createCharacterForm.addEventListener(
 
                 const {
                     data: existingFiles,
-                    error: fileCheckError
-                } = await supabaseClient
-                    .storage
-                    .from("character-images")
-                    .list("", {
-                        search: imageFileName
-                    });
+                    error:
+                        fileCheckError
+                } =
+                    await supabaseClient
+                        .storage
+                        .from(
+                            "character-images"
+                        )
+                        .list(
+                            "",
+                            {
+                                search:
+                                    imageFileName
+                            }
+                        );
 
 
-                if (fileCheckError) {
+                if (
+                    fileCheckError
+                ) {
 
                     console.error(
                         "Image check error:",
@@ -895,11 +1811,14 @@ createCharacterForm.addEventListener(
                     existingFiles &&
                     existingFiles.some(
                         file =>
-                            file.name === imageFileName
+                            file.name ===
+                            imageFileName
                     );
 
 
-                if (exactFileExists) {
+                if (
+                    exactFileExists
+                ) {
 
                     throw new Error(
                         `The image "${imageFileName}" already exists in Character Images.`
@@ -913,21 +1832,30 @@ createCharacterForm.addEventListener(
                 // ---------------------------------------------
 
                 const {
-                    error: uploadError
-                } = await supabaseClient
-                    .storage
-                    .from("character-images")
-                    .upload(
-                        imagePath,
-                        croppedImageBlob,
-                        {
-                            contentType: "image/png",
-                            upsert: false
-                        }
-                    );
+                    error:
+                        uploadError
+                } =
+                    await supabaseClient
+                        .storage
+                        .from(
+                            "character-images"
+                        )
+                        .upload(
+                            imagePath,
+                            croppedImageBlob,
+                            {
+                                contentType:
+                                    "image/png",
+
+                                upsert:
+                                    false
+                            }
+                        );
 
 
-                if (uploadError) {
+                if (
+                    uploadError
+                ) {
 
                     console.error(
                         "Image upload error:",
@@ -946,112 +1874,61 @@ createCharacterForm.addEventListener(
                 // ---------------------------------------------
 
                 const {
-                    data: publicURLData
-                } = supabaseClient
-                    .storage
-                    .from("character-images")
-                    .getPublicUrl(imagePath);
+                    data:
+                        publicURLData
+                } =
+                    supabaseClient
+                        .storage
+                        .from(
+                            "character-images"
+                        )
+                        .getPublicUrl(
+                            imagePath
+                        );
 
 
-                profileImageURL =
+                const profileImageURL =
                     publicURLData.publicUrl;
 
-            }
-
-
-            // =================================================
-            // 3. CREATE CHARACTER
-            // =================================================
-
-            const {
-                data: newCharacter,
-                error: characterInsertError
-            } = await supabaseClient
-                .from("characters")
-                .insert({
-
-                    first_name: firstName,
-
-                    last_name: lastName,
-
-                    display_name: displayName,
-
-                    aliases: aliases,
-
-                    gender: gender,
-
-                    species: species,
-
-                    height: height,
-
-                    hair_color: hairColor,
-
-                    eye_color: eyeColor,
-
-                    date_of_birth: dateOfBirth,
-
-                    zodiac_sign: zodiacSign,
-
-                    birth_place: birthPlace,
-
-                    residence: residence,
-
-                    occupation: occupation,
-
-                    affiliations: affiliations,
-
-                    marital_status: maritalStatus,
-
-                    profile_status: "draft",
-
-                    profile_image: profileImageURL
-
-                })
-                .select()
-                .single();
-
-
-            if (characterInsertError) {
-
-                console.error(
-                    "Character creation error:",
-                    characterInsertError
-                );
-
 
                 // ---------------------------------------------
-                // If database creation failed after uploading
-                // the image, remove the orphaned image.
+                // Save image URL to character
                 // ---------------------------------------------
 
-                if (croppedImageBlob) {
-
+                const {
+                    error:
+                        imageUpdateError
+                } =
                     await supabaseClient
-                        .storage
-                        .from("character-images")
-                        .remove([
-                            imagePath
-                        ]);
+                        .from(
+                            "characters"
+                        )
+                        .update({
 
-                }
+                            profile_image:
+                                profileImageURL
 
+                        })
+                        .eq(
+                            "id",
+                            currentCharacterId
+                        );
 
-                // Handle duplicate-name constraint
 
                 if (
-                    characterInsertError.code === "23505"
+                    imageUpdateError
                 ) {
 
+                    console.error(
+                        "Profile image database update error:",
+                        imageUpdateError
+                    );
+
                     throw new Error(
-                        `${firstName} ${lastName} already exists in the Character Vault.`
+                        "The character was saved, but the profile image could not be linked."
                     );
 
                 }
-
-
-                throw new Error(
-                    "The character could not be created."
-                );
 
             }
 
@@ -1060,25 +1937,31 @@ createCharacterForm.addEventListener(
             // 4. SUCCESS
             // =================================================
 
-            console.log(
-                "Character successfully created:",
-                newCharacter
-            );
-
-
             alert(
                 `${firstName} ${lastName} has been created!`
             );
 
 
-            // -------------------------------------------------
-            // Reset form
-            // -------------------------------------------------
+            console.log(
+                "Character successfully saved."
+            );
 
+
+            // Stop autosave
+            stopCharacterDraftAutosave();
+
+
+            // Reset draft ID
+            currentCharacterId =
+                null;
+
+
+            // Reset form
             createCharacterForm.reset();
 
 
-            croppedImageBlob = null;
+            croppedImageBlob =
+                null;
 
 
             imagePreview.innerHTML =
@@ -1089,13 +1972,16 @@ createCharacterForm.addEventListener(
                 "none";
 
 
-            profileImageInput.value = "";
+            profileImageInput.value =
+                "";
 
 
-            // -------------------------------------------------
+            // Reset gender symbol
+            genderSymbol.textContent =
+                "—";
+
+
             // Return to Character Vault
-            // -------------------------------------------------
-
             showVault();
 
 
@@ -1109,12 +1995,14 @@ createCharacterForm.addEventListener(
 
             errorElement.textContent =
                 error.message ||
-                "Something went wrong while creating the character.";
+                "Something went wrong while saving the character.";
 
 
         } finally {
 
-            saveButton.disabled = false;
+            saveButton.disabled =
+                false;
+
 
             saveButton.textContent =
                 originalButtonText;
@@ -1125,8 +2013,8 @@ createCharacterForm.addEventListener(
 );
 
 
-// ------------------------------------------------------------
+// ============================================================
 // START APPLICATION
-// ------------------------------------------------------------
+// ============================================================
 
 checkLogin();

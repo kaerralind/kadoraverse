@@ -348,6 +348,11 @@
                             JPG, PNG, GIF, or WebP
                         </p>
 
+                        <p class="image-save-note">
+                            <strong>Note:</strong> Profile images are not saved during draft autosaves.
+                            The image will be uploaded when the character is completely saved.
+                        </p>
+
                     </div>
 
                 </div>
@@ -713,33 +718,30 @@
 
 
             <!-- ================================
-                 FAMILY
-                 ================================ -->
+                FAMILY
+                ================================ -->
 
             <section class="form-section">
 
                 <h2>Family</h2>
 
+                <div
+                    id="partner-section"
+                >
 
-                <div class="form-grid">
+                    <div id="partners-container"></div>
 
-                    <div class="form-field">
-
-                        <label for="marital-status">
-                            Marital Status
-                        </label>
-
-                        <input
-                            type="text"
-                            id="marital-status"
-                            name="marital_status"
-                        >
-
-                    </div>
+                    <button
+                        type="button"
+                        id="add-partner"
+                    >
+                        + Add Partner
+                    </button>
 
                 </div>
 
             </section>
+
 
 
             <!-- ================================
