@@ -591,32 +591,32 @@ createCharacterForm.addEventListener(
 
         event.preventDefault();
 
-        console.log(
-            "Character form submitted."
-        );
-
-
         const errorElement =
             document.getElementById(
                 "character-form-error"
             );
 
-
         errorElement.textContent = "";
 
 
-        // Make sure the required names exist
+        // ----------------------------------------------------
+        // GET BASIC IDENTITY
+        // ----------------------------------------------------
+
         const firstName =
             document.getElementById(
                 "first-name"
             ).value.trim();
-
 
         const lastName =
             document.getElementById(
                 "last-name"
             ).value.trim();
 
+
+        // ----------------------------------------------------
+        // VALIDATE REQUIRED FIELDS
+        // ----------------------------------------------------
 
         if (!firstName || !lastName) {
 
@@ -628,34 +628,468 @@ createCharacterForm.addEventListener(
         }
 
 
-        /*
-         * CHARACTER CREATION WILL BE CONNECTED
-         * TO SUPABASE HERE.
-         *
-         * For now, we're just confirming that
-         * the form is working.
-         */
+        // ----------------------------------------------------
+        // GET ALL FORM VALUES
+        // ----------------------------------------------------
 
-        console.log(
-            "Character:",
-            firstName,
-            lastName
-        );
+        const displayName =
+            document.getElementById(
+                "display-name"
+            ).value.trim() || null;
 
 
-        if (croppedImageBlob) {
+        const aliases =
+            document.getElementById(
+                "aliases"
+            ).value.trim() || null;
 
-            console.log(
-                "Cropped profile image ready:",
-                croppedImageBlob
-            );
+
+        const gender =
+            document.getElementById(
+                "gender"
+            ).value.trim() || null;
+
+
+        const species =
+            document.getElementById(
+                "species"
+            ).value.trim() || null;
+
+
+        const height =
+            document.getElementById(
+                "height"
+            ).value.trim() || null;
+
+
+        const hairColor =
+            document.getElementById(
+                "hair-color"
+            ).value.trim() || null;
+
+
+        const eyeColor =
+            document.getElementById(
+                "eye-color"
+            ).value.trim() || null;
+
+
+        const birthMonth =
+            document.getElementById(
+                "birth-month"
+            ).value;
+
+
+        const birthDay =
+            document.getElementById(
+                "birth-day"
+            ).value;
+
+
+        const birthYear =
+            document.getElementById(
+                "birth-year"
+            ).value;
+
+
+        const zodiacSign =
+            document.getElementById(
+                "zodiac-sign"
+            ).value.trim() || null;
+
+
+        const birthPlace =
+            document.getElementById(
+                "birth-place"
+            ).value.trim() || null;
+
+
+        const residence =
+            document.getElementById(
+                "residence"
+            ).value.trim() || null;
+
+
+        const occupation =
+            document.getElementById(
+                "occupation"
+            ).value.trim() || null;
+
+
+        const affiliations =
+            document.getElementById(
+                "affiliations"
+            ).value.trim() || null;
+
+
+        const maritalStatus =
+            document.getElementById(
+                "marital-status"
+            ).value.trim() || null;
+
+
+        // ----------------------------------------------------
+        // BUILD DATE OF BIRTH
+        // ----------------------------------------------------
+
+        let dateOfBirth = null;
+
+
+        if (
+            birthMonth &&
+            birthDay &&
+            birthYear
+        ) {
+
+            const month =
+                String(birthMonth).padStart(2, "0");
+
+            const day =
+                String(birthDay).padStart(2, "0");
+
+
+            dateOfBirth =
+                `${birthYear}-${month}-${day}`;
 
         }
 
 
-        alert(
-            `${firstName} ${lastName} is ready to be created!`
-        );
+        // ----------------------------------------------------
+        // SHOW SAVING STATE
+        // ----------------------------------------------------
+
+        const saveButton =
+            createCharacterForm.querySelector(
+                ".save-character-button"
+            );
+
+
+        const originalButtonText =
+            saveButton.textContent;
+
+
+        saveButton.disabled = true;
+
+        saveButton.textContent =
+            "Creating Character...";
+
+
+        try {
+
+
+            // =================================================
+            // 1. CHECK FOR EXISTING CHARACTER
+            // =================================================
+
+            const {
+                data: existingCharacter,
+                error: existingCharacterError
+            } = await supabaseClient
+                .from("characters")
+                .select("id")
+                .eq("first_name", firstName)
+                .eq("last_name", lastName)
+                .maybeSingle();
+
+
+            if (existingCharacterError) {
+
+                console.error(
+                    "Character lookup error:",
+                    existingCharacterError
+                );
+
+                throw new Error(
+                    "Could not check whether this character already exists."
+                );
+
+            }
+
+
+            if (existingCharacter) {
+
+                throw new Error(
+                    `${firstName} ${lastName} already exists in the Character Vault.`
+                );
+
+            }
+
+
+            // =================================================
+            // 2. UPLOAD PROFILE IMAGE
+            // =================================================
+
+            let profileImageURL = null;
+
+
+            if (croppedImageBlob) {
+
+                const imageFileName =
+                    `${firstName} ${lastName}.png`;
+
+
+                const imagePath =
+                    imageFileName;
+
+
+                // ---------------------------------------------
+                // Check whether exact filename already exists
+                // ---------------------------------------------
+
+                const {
+                    data: existingFiles,
+                    error: fileCheckError
+                } = await supabaseClient
+                    .storage
+                    .from("character-images")
+                    .list("", {
+                        search: imageFileName
+                    });
+
+
+                if (fileCheckError) {
+
+                    console.error(
+                        "Image check error:",
+                        fileCheckError
+                    );
+
+                    throw new Error(
+                        "Could not check the character image storage."
+                    );
+
+                }
+
+
+                const exactFileExists =
+                    existingFiles &&
+                    existingFiles.some(
+                        file =>
+                            file.name === imageFileName
+                    );
+
+
+                if (exactFileExists) {
+
+                    throw new Error(
+                        `The image "${imageFileName}" already exists in Character Images.`
+                    );
+
+                }
+
+
+                // ---------------------------------------------
+                // Upload image
+                // ---------------------------------------------
+
+                const {
+                    error: uploadError
+                } = await supabaseClient
+                    .storage
+                    .from("character-images")
+                    .upload(
+                        imagePath,
+                        croppedImageBlob,
+                        {
+                            contentType: "image/png",
+                            upsert: false
+                        }
+                    );
+
+
+                if (uploadError) {
+
+                    console.error(
+                        "Image upload error:",
+                        uploadError
+                    );
+
+                    throw new Error(
+                        "The character image could not be uploaded."
+                    );
+
+                }
+
+
+                // ---------------------------------------------
+                // Get public image URL
+                // ---------------------------------------------
+
+                const {
+                    data: publicURLData
+                } = supabaseClient
+                    .storage
+                    .from("character-images")
+                    .getPublicUrl(imagePath);
+
+
+                profileImageURL =
+                    publicURLData.publicUrl;
+
+            }
+
+
+            // =================================================
+            // 3. CREATE CHARACTER
+            // =================================================
+
+            const {
+                data: newCharacter,
+                error: characterInsertError
+            } = await supabaseClient
+                .from("characters")
+                .insert({
+
+                    first_name: firstName,
+
+                    last_name: lastName,
+
+                    display_name: displayName,
+
+                    aliases: aliases,
+
+                    gender: gender,
+
+                    species: species,
+
+                    height: height,
+
+                    hair_color: hairColor,
+
+                    eye_color: eyeColor,
+
+                    date_of_birth: dateOfBirth,
+
+                    zodiac_sign: zodiacSign,
+
+                    birth_place: birthPlace,
+
+                    residence: residence,
+
+                    occupation: occupation,
+
+                    affiliations: affiliations,
+
+                    marital_status: maritalStatus,
+
+                    profile_status: "draft",
+
+                    profile_image: profileImageURL
+
+                })
+                .select()
+                .single();
+
+
+            if (characterInsertError) {
+
+                console.error(
+                    "Character creation error:",
+                    characterInsertError
+                );
+
+
+                // ---------------------------------------------
+                // If database creation failed after uploading
+                // the image, remove the orphaned image.
+                // ---------------------------------------------
+
+                if (croppedImageBlob) {
+
+                    await supabaseClient
+                        .storage
+                        .from("character-images")
+                        .remove([
+                            imagePath
+                        ]);
+
+                }
+
+
+                // Handle duplicate-name constraint
+
+                if (
+                    characterInsertError.code === "23505"
+                ) {
+
+                    throw new Error(
+                        `${firstName} ${lastName} already exists in the Character Vault.`
+                    );
+
+                }
+
+
+                throw new Error(
+                    "The character could not be created."
+                );
+
+            }
+
+
+            // =================================================
+            // 4. SUCCESS
+            // =================================================
+
+            console.log(
+                "Character successfully created:",
+                newCharacter
+            );
+
+
+            alert(
+                `${firstName} ${lastName} has been created!`
+            );
+
+
+            // -------------------------------------------------
+            // Reset form
+            // -------------------------------------------------
+
+            createCharacterForm.reset();
+
+
+            croppedImageBlob = null;
+
+
+            imagePreview.innerHTML =
+                "<span>No Image</span>";
+
+
+            removeImageButton.style.display =
+                "none";
+
+
+            profileImageInput.value = "";
+
+
+            // -------------------------------------------------
+            // Return to Character Vault
+            // -------------------------------------------------
+
+            showVault();
+
+
+        } catch (error) {
+
+            console.error(
+                "Character creation failed:",
+                error
+            );
+
+
+            errorElement.textContent =
+                error.message ||
+                "Something went wrong while creating the character.";
+
+
+        } finally {
+
+            saveButton.disabled = false;
+
+            saveButton.textContent =
+                originalButtonText;
+
+        }
 
     }
 );
