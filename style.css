@@ -347,3 +347,8 @@ body {
 .logout-button:hover {
     background: #f5f3f0;
 }
+
+/* Hide elements using the HTML hidden attribute */
+[hidden] {
+    display: none !important;
+}
