@@ -7,6 +7,10 @@
     <title>Kadoraverse Character Vault</title>
 
     <link rel="stylesheet" href="style.css">
+    <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css"
+>
 </head>
 
 <body>
@@ -351,6 +355,93 @@
             </section>
 
 
+            <!-- =================================
+                 IMAGE CROPPER
+                 ================================= -->
+
+            <div
+                id="image-cropper-modal"
+                class="image-cropper-modal"
+                style="display: none;"
+            >
+
+                <div class="image-cropper-box">
+
+                    <div class="image-cropper-header">
+
+                        <h3>Adjust Character Image</h3>
+
+                        <p>
+                            Drag the image to reposition it.
+                            Use the slider to zoom.
+                        </p>
+
+                    </div>
+
+
+                    <div class="cropper-container">
+
+                        <img
+                            id="cropper-image"
+                            alt="Image being cropped"
+                        >
+
+                    </div>
+
+
+                    <div class="cropper-controls">
+
+                        <label for="cropper-zoom">
+                            Zoom
+                        </label>
+
+                        <input
+                            type="range"
+                            id="cropper-zoom"
+                            min="0.1"
+                            max="5"
+                            step="0.01"
+                            value="1"
+                        >
+
+                    </div>
+
+
+                    <div class="cropper-actions">
+
+                        <button
+                            type="button"
+                            id="cropper-cancel"
+                            class="cancel-button"
+                        >
+                            Cancel
+                        </button>
+
+
+                        <button
+                            type="button"
+                            id="cropper-reset"
+                            class="secondary-button"
+                        >
+                            Reset
+                        </button>
+
+
+                        <button
+                            type="button"
+                            id="cropper-apply"
+                            class="save-character-button"
+                        >
+                            Apply Crop
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
             <!-- ================================
                  APPEARANCE
                  ================================ -->
@@ -690,6 +781,8 @@
          ========================================= -->
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
 
     <script src="supabase.js"></script>
 
