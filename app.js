@@ -21,13 +21,13 @@ const logoutButton = document.getElementById("logout-button");
 // ------------------------------------------------------------
 
 function showApp() {
-    loginPage.hidden = true;
-    app.hidden = false;
+    loginPage.style.display = "none";
+    app.style.display = "block";
 }
 
 function showLogin() {
-    loginPage.hidden = false;
-    app.hidden = true;
+    loginPage.style.display = "flex";
+    app.style.display = "none";
 }
 
 
