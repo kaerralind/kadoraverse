@@ -3348,6 +3348,7 @@ createCharacterForm.addEventListener(
                             "last_name",
                             lastName
                         )
+                        .limit(1)
                         .maybeSingle();
 
 
