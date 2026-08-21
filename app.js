@@ -382,10 +382,15 @@ async function saveCharacterDraft() {
         ).value.trim() || null;
 
 
-    const maritalStatus =
-        document.getElementById(
-            "marital-status"
-        ).value.trim() || null;
+    const relationshipStatusElement =
+    document.getElementById(
+        "relationship-status"
+    );
+
+    const relationshipStatus =
+        relationshipStatusElement
+            ? relationshipStatusElement.value.trim() || null
+            : null;
 
 
     const profileDumpElement =
@@ -501,8 +506,8 @@ async function saveCharacterDraft() {
         affiliations:
             affiliations,
 
-        marital_status:
-            maritalStatus,
+        relationship_status:
+            relationshipStatus,
 
         profile_dump:
             profileDump,
@@ -3116,10 +3121,15 @@ createCharacterForm.addEventListener(
             ).value.trim() || null;
 
 
-        const maritalStatus =
+        const relationshipStatusElement =
             document.getElementById(
-                "marital-status"
-            ).value.trim() || null;
+                "relationship-status"
+            );
+
+        const relationshipStatus =
+            relationshipStatusElement
+                ? relationshipStatusElement.value.trim() || null
+                : null;
 
 
         const profileDumpElement =
@@ -3260,8 +3270,8 @@ createCharacterForm.addEventListener(
                 affiliations:
                     affiliations,
 
-                marital_status:
-                    maritalStatus,
+                relationship_status:
+                    relationshipStatus,
 
                 profile_dump:
                     profileDump,
