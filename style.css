@@ -886,20 +886,25 @@ body {
 }
 
 /* =========================================
-   BOX CUSTOMIZATION
+   FAMILY BOX CUSTOMIZATION
    ========================================= */
 
-#add-partner {
+#add-parent,
+#add-sibling,
+#add-extended-family,
+#add-partner,
+#add-child {
     width: 100px;
     height: 40px;
     min-width: 0;
+    margin-bottom: 20px;
     padding: 0 10px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.remove-partner-button {
+.remove-family-button {
     width: 100px;
     height: 40px;
     min-width: 0;
@@ -910,12 +915,89 @@ body {
     justify-content: center;
 }
 
-.partner-status {
+.family-relationship,
+.family-status {
+    width: 160px;
+    height: 44px;
+    min-width: 0;
+    text-align: left;
+    padding-left: 10px;
+}
+
+#add-parent,
+#add-sibling,
+#add-extended-family,
+#add-partner,
+#add-child,
+.remove-family-button,
+.family-relationship,
+.family-status {
+    border: 1px solid #E0DDD8;
+    border-radius: 8px;
+    outline: none;
+}
+
+#add-parent:focus,
+#add-sibling:focus,
+#add-extended-family:focus,
+#add-partner:focus,
+#add-child:focus,
+.remove-family-button:focus,
+.family-relationship:focus,
+.family-status:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+/* =========================================
+   OCCUPATION BOX CUSTOMIZATION
+   ========================================= */
+
+#add-occupation {
+    width: 100px;
+    height: 40px;
+    min-width: 0;
+    margin-bottom: 20px;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.remove-occupation-button {
+    width: 100px;
+    height: 40px;
+    min-width: 0;
+    margin-bottom: 10px;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.occupation-status {
     width: 130px;
     height: 44px;
     min-width: 0;
     text-align: left;
     padding-left: 10px;
+}
+
+.occupation-name,
+.occupation-status,
+#add-occupation,
+.remove-occupation-button {
+    border: 1px solid #E0DDD8;
+    border-radius: 8px;
+    outline: none;
+}
+
+.occupation-name:focus,
+.occupation-status:focus,
+#add-occupation:focus,
+.remove-occupation-button:focus {
+    outline: none;
+    box-shadow: none;
 }
 
 .gender-selector select,

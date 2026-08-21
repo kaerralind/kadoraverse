@@ -33,17 +33,22 @@ const cancelCharacterButton =
 const createCharacterForm =
     document.getElementById("create-character-form");
 
-// Relationship / partner elements
-const partnerSection =
-    document.getElementById("partner-section");
 
-const partnersContainer =
-    document.getElementById("partners-container");
+// ------------------------------------------------------------
+// Occupation elements
+// ------------------------------------------------------------
 
-const addPartnerButton =
-    document.getElementById("add-partner");
+const occupationsContainer =
+    document.getElementById("occupations-container");
 
+const addOccupationButton =
+    document.getElementById("add-occupation");
+
+
+// ------------------------------------------------------------
 // Character image
+// ------------------------------------------------------------
+
 const profileImageInput =
     document.getElementById("profile-image");
 
@@ -53,14 +58,22 @@ const imagePreview =
 const removeImageButton =
     document.getElementById("remove-image");
 
+
+// ------------------------------------------------------------
 // Gender
+// ------------------------------------------------------------
+
 const genderSelect =
     document.getElementById("gender");
 
 const genderSymbol =
     document.getElementById("gender-symbol");
 
+
+// ------------------------------------------------------------
 // Cropper
+// ------------------------------------------------------------
+
 const cropperModal =
     document.getElementById("image-cropper-modal");
 
@@ -80,9 +93,9 @@ const cropperApply =
     document.getElementById("cropper-apply");
 
 
-// ------------------------------------------------------------
+// ============================================================
 // DRAFT / CROPPER STATE
-// ------------------------------------------------------------
+// ============================================================
 
 let cropper = null;
 let selectedImageURL = null;
@@ -236,7 +249,6 @@ function stopCharacterDraftAutosave() {
 
 async function saveCharacterDraft() {
 
-    // Don't autosave when the creation page is hidden
     if (
         createCharacterPage.style.display === "none"
     ) {
@@ -255,13 +267,13 @@ async function saveCharacterDraft() {
             "first-name"
         ).value.trim();
 
+
     const lastName =
         document.getElementById(
             "last-name"
         ).value.trim();
 
 
-    // Don't create a database row without a name
     if (
         !firstName ||
         !lastName
@@ -361,12 +373,6 @@ async function saveCharacterDraft() {
     const residence =
         document.getElementById(
             "residence"
-        ).value.trim() || null;
-
-
-    const occupation =
-        document.getElementById(
-            "occupation"
         ).value.trim() || null;
 
 
@@ -492,9 +498,6 @@ async function saveCharacterDraft() {
         residence:
             residence,
 
-        occupation:
-            occupation,
-
         affiliations:
             affiliations,
 
@@ -543,6 +546,16 @@ async function saveCharacterDraft() {
             }
 
 
+            await saveCharacterOccupations(
+                currentCharacterId
+            );
+
+
+            await saveCharacterFamily(
+                currentCharacterId
+            );
+
+
             console.log(
                 "Character draft autosaved."
             );
@@ -586,6 +599,16 @@ async function saveCharacterDraft() {
 
         console.log(
             "Character draft created:",
+            currentCharacterId
+        );
+
+
+        await saveCharacterOccupations(
+            currentCharacterId
+        );
+
+
+        await saveCharacterFamily(
             currentCharacterId
         );
 
@@ -1624,7 +1647,6 @@ genderSelect.addEventListener(
             this.value;
 
 
-        // Display only
         genderSymbol.textContent =
             genderSymbols[selectedGender] ||
             "—";
@@ -2061,74 +2083,636 @@ birthYearInput.addEventListener(
 
 
 // ============================================================
-// CHARACTER RELATIONSHIPS
+// CHARACTER FAMILY
 // ============================================================
+
+
+// ------------------------------------------------------------
+// FAMILY ELEMENTS
+// ------------------------------------------------------------
+
+const parentsContainer =
+    document.getElementById(
+        "parents-container"
+    );
+
+
+const siblingsContainer =
+    document.getElementById(
+        "siblings-container"
+    );
+
+
+const partnersContainer =
+    document.getElementById(
+        "partners-container"
+    );
+
+
+const childrenContainer =
+    document.getElementById(
+        "children-container"
+    );
+
+
+const extendedFamilyContainer =
+    document.getElementById(
+        "extended-family-container"
+    );
+
+
+const addParentButton =
+    document.getElementById(
+        "add-parent"
+    );
+
+
+const addSiblingButton =
+    document.getElementById(
+        "add-sibling"
+    );
+
+
+const addPartnerButton =
+    document.getElementById(
+        "add-partner"
+    );
+
+
+const addChildButton =
+    document.getElementById(
+        "add-child"
+    );
+
+
+const addExtendedFamilyButton =
+    document.getElementById(
+        "add-extended-family"
+    );
+
+
+// ------------------------------------------------------------
+// FAMILY RELATIONSHIP TYPES
+// ------------------------------------------------------------
+
+const parentTypes = [
+
+    "Mother",
+    "Father",
+    "Stepparent",
+    "Adoptive Parent",
+    "Guardian",
+    "Other"
+
+];
+
+
+const siblingTypes = [
+
+    "Sibling",
+    "Half-Sibling",
+    "Stepsibling",
+    "Adoptive Sibling",
+    "Other"
+
+];
+
+
+const childTypes = [
+
+    "Child",
+    "Adopted Child",
+    "Stepchild",
+    "Other"
+
+];
+
 
 const partnerRelationshipStatuses = [
 
     "Dating",
-
     "Engaged",
-
     "Married",
-
     "Mated",
-
     "Separated",
-
     "Divorced",
-
     "Widowed",
-
     "Open Relationship",
-
     "It's Complicated"
 
 ];
 
 
+const extendedFamilyTypes = [
+
+    "Grandparent",
+    "Grandchild",
+    "Aunt",
+    "Uncle",
+    "Cousin",
+    "Niece",
+    "Nephew",
+    "Other"
+
+];
+
+
 // ------------------------------------------------------------
-// SHOW PARTNER SECTION
+// CREATE FAMILY ENTRY
 // ------------------------------------------------------------
 
-function updatePartnerSectionVisibility() {
+function createFamilyEntry(
+    container,
+    relationshipTypes,
+    removeText,
+    includeStatus = false
+) {
 
-    partnerSection.style.display =
-        "block";
+    const familyEntry =
+        document.createElement(
+            "div"
+        );
+
+
+    familyEntry.className =
+        "family-entry";
+
+
+    // ========================================================
+    // STANDARD FAMILY ENTRY
+    // ========================================================
+
+    if (!includeStatus) {
+
+        familyEntry.innerHTML = `
+
+            <div class="form-grid">
+
+                <div class="form-field">
+
+                    <input
+                        type="text"
+                        class="family-name"
+                        placeholder="Character Name"
+                    >
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <select
+                        class="family-relationship"
+                    >
+
+                        <option value="">
+                            Select Relationship
+                        </option>
+
+                        ${relationshipTypes.map(
+                            relationship =>
+                                `<option value="${relationship}">${relationship}</option>`
+                        ).join("")}
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="remove-family-button"
+            >
+                ${removeText}
+            </button>
+
+        `;
+
+    }
+
+
+    // ========================================================
+    // PARTNER ENTRY
+    // ========================================================
+
+    else {
+
+        familyEntry.innerHTML = `
+
+            <div class="form-grid">
+
+                <div class="form-field">
+
+                    <input
+                        type="text"
+                        class="family-name"
+                        placeholder="Character Name"
+                    >
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <select
+                        class="family-status"
+                    >
+
+                        <option value="">
+                            Relationship Status
+                        </option>
+
+                        ${partnerRelationshipStatuses.map(
+                            status =>
+                                `<option value="${status}">${status}</option>`
+                        ).join("")}
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="remove-family-button"
+            >
+                ${removeText}
+            </button>
+
+        `;
+
+    }
+
+
+    container.appendChild(
+        familyEntry
+    );
+
+
+    const removeButton =
+        familyEntry.querySelector(
+            ".remove-family-button"
+        );
+
+
+    removeButton.addEventListener(
+        "click",
+        function() {
+
+            familyEntry.remove();
+
+        }
+    );
 
 }
+
+
+// ------------------------------------------------------------
+// ADD PARENT
+// ------------------------------------------------------------
+
+addParentButton.addEventListener(
+    "click",
+    function() {
+
+        createFamilyEntry(
+            parentsContainer,
+            parentTypes,
+            "- Remove Parent"
+        );
+
+    }
+);
+
+
+// ------------------------------------------------------------
+// ADD SIBLING
+// ------------------------------------------------------------
+
+addSiblingButton.addEventListener(
+    "click",
+    function() {
+
+        createFamilyEntry(
+            siblingsContainer,
+            siblingTypes,
+            "- Remove Sibling"
+        );
+
+    }
+);
 
 
 // ------------------------------------------------------------
 // ADD PARTNER
 // ------------------------------------------------------------
 
-function addPartner() {
+addPartnerButton.addEventListener(
+    "click",
+    function() {
 
-    const partnerEntry =
+        createFamilyEntry(
+            partnersContainer,
+            [],
+            "- Remove Partner",
+            true
+        );
+
+    }
+);
+
+
+// ------------------------------------------------------------
+// ADD CHILD
+// ------------------------------------------------------------
+
+addChildButton.addEventListener(
+    "click",
+    function() {
+
+        createFamilyEntry(
+            childrenContainer,
+            childTypes,
+            "- Remove Child"
+        );
+
+    }
+);
+
+
+// ------------------------------------------------------------
+// ADD EXTENDED FAMILY
+// ------------------------------------------------------------
+
+addExtendedFamilyButton.addEventListener(
+    "click",
+    function() {
+
+        createFamilyEntry(
+            extendedFamilyContainer,
+            extendedFamilyTypes,
+            "- Remove Relative"
+        );
+
+    }
+);
+
+
+// ============================================================
+// COLLECT FAMILY DATA
+// ============================================================
+
+function getFamilyData() {
+
+    const familyEntries =
+        document.querySelectorAll(
+            ".family-entry"
+        );
+
+
+    const family = [];
+
+
+    familyEntries.forEach(
+        (entry, index) => {
+
+            const nameInput =
+                entry.querySelector(
+                    ".family-name"
+                );
+
+
+            const relationshipInput =
+                entry.querySelector(
+                    ".family-relationship"
+                );
+
+
+            const statusInput =
+                entry.querySelector(
+                    ".family-status"
+                );
+
+
+            const name =
+                nameInput.value.trim();
+
+
+            // ------------------------------------------------
+            // Standard family relationships
+            // ------------------------------------------------
+
+            const relationship =
+                relationshipInput
+                    ? relationshipInput.value
+                    : null;
+
+
+            // ------------------------------------------------
+            // Partner relationship status
+            // ------------------------------------------------
+
+            const status =
+                statusInput
+                    ? statusInput.value
+                    : null;
+
+
+            // Ignore completely empty rows
+            if (!name) {
+
+                return;
+
+            }
+
+
+            family.push({
+
+                related_character:
+                    name,
+
+                relationship_type:
+                    relationship,
+
+                relationship_status:
+                    status || null,
+
+                sort_order:
+                    index
+
+            });
+
+        }
+    );
+
+
+    return family;
+
+}
+
+
+// ============================================================
+// SAVE CHARACTER FAMILY
+// ============================================================
+
+async function saveCharacterFamily(
+    characterId
+) {
+
+    const family =
+        getFamilyData();
+
+
+    // --------------------------------------------------------
+    // REMOVE EXISTING FAMILY
+    // --------------------------------------------------------
+
+    const {
+        error:
+            deleteError
+    } =
+        await supabaseClient
+            .from("character_family")
+            .delete()
+            .eq(
+                "character_id",
+                characterId
+            );
+
+
+    if (deleteError) {
+
+        console.error(
+            "Family delete error:",
+            deleteError
+        );
+
+        throw new Error(
+            "Could not update character family."
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // NO FAMILY ENTRIES
+    // --------------------------------------------------------
+
+    if (
+        family.length === 0
+    ) {
+
+        return;
+
+    }
+
+
+    // --------------------------------------------------------
+    // INSERT FAMILY
+    // --------------------------------------------------------
+
+    const familyRows =
+        family.map(
+            member => ({
+
+                character_id:
+                    characterId,
+
+                related_character:
+                    member.related_character,
+
+                relationship_type:
+                    member.relationship_type,
+
+                relationship_status:
+                    member.relationship_status,
+
+                sort_order:
+                    member.sort_order
+
+            })
+        );
+
+
+    const {
+        error:
+            insertError
+    } =
+        await supabaseClient
+            .from("character_family")
+            .insert(
+                familyRows
+            );
+
+
+    if (insertError) {
+
+        console.error(
+            "Family insert error:",
+            insertError
+        );
+
+        throw new Error(
+            "Could not save character family."
+        );
+
+    }
+
+}
+
+
+// ============================================================
+// CHARACTER OCCUPATIONS
+// ============================================================
+
+
+// ------------------------------------------------------------
+// OCCUPATION STATUSES
+// ------------------------------------------------------------
+
+const occupationStatuses = [
+
+    "Current",
+    "Former",
+    "Retired"
+
+];
+
+
+// ------------------------------------------------------------
+// ADD OCCUPATION
+// ------------------------------------------------------------
+
+function addOccupation() {
+
+    const occupationEntry =
         document.createElement(
             "div"
         );
 
 
-    partnerEntry.className =
-        "partner-entry";
+    occupationEntry.className =
+        "occupation-entry";
 
 
-    partnerEntry.innerHTML = `
+    occupationEntry.innerHTML = `
 
         <div class="form-grid">
 
             <div class="form-field">
 
                 <label>
-                    Partner
+                    Occupation
                 </label>
 
                 <input
                     type="text"
-                    class="partner-name"
-                    placeholder="Character name"
+                    class="occupation-name"
+                    placeholder="e.g. Occupation"
                 >
 
             </div>
@@ -2137,18 +2721,16 @@ function addPartner() {
             <div class="form-field">
 
                 <label>
-                    Relationship Status
+                    Status
                 </label>
 
-                <select
-                    class="partner-status"
-                >
+                <select class="occupation-status">
 
                     <option value="">
-                        Select...
+                        Select Status
                     </option>
 
-                    ${partnerRelationshipStatuses.map(
+                    ${occupationStatuses.map(
                         status =>
                             `<option value="${status}">${status}</option>`
                     ).join("")}
@@ -2162,22 +2744,22 @@ function addPartner() {
 
         <button
             type="button"
-            class="remove-partner-button"
+            class="remove-occupation-button"
         >
-            Remove Partner
+            - Remove Occupation
         </button>
 
     `;
 
 
-    partnersContainer.appendChild(
-        partnerEntry
+    occupationsContainer.appendChild(
+        occupationEntry
     );
 
 
     const removeButton =
-        partnerEntry.querySelector(
-            ".remove-partner-button"
+        occupationEntry.querySelector(
+            ".remove-occupation-button"
         );
 
 
@@ -2185,7 +2767,7 @@ function addPartner() {
         "click",
         function() {
 
-            partnerEntry.remove();
+            occupationEntry.remove();
 
         }
     );
@@ -2194,17 +2776,191 @@ function addPartner() {
 
 
 // ------------------------------------------------------------
-// ADD PARTNER BUTTON
+// ADD OCCUPATION BUTTON
 // ------------------------------------------------------------
 
-addPartnerButton.addEventListener(
+addOccupationButton.addEventListener(
     "click",
     function() {
 
-        addPartner();
+        addOccupation();
 
     }
 );
+
+
+// ============================================================
+// COLLECT OCCUPATIONS
+// ============================================================
+
+function getOccupationData() {
+
+    const occupationEntries =
+        occupationsContainer.querySelectorAll(
+            ".occupation-entry"
+        );
+
+
+    const occupations = [];
+
+
+    occupationEntries.forEach(
+        (entry, index) => {
+
+            const occupationInput =
+                entry.querySelector(
+                    ".occupation-name"
+                );
+
+
+            const statusInput =
+                entry.querySelector(
+                    ".occupation-status"
+                );
+
+
+            const occupation =
+                occupationInput.value.trim();
+
+
+            const status =
+                statusInput.value;
+
+
+            if (!occupation) {
+
+                return;
+
+            }
+
+
+            occupations.push({
+
+                occupation:
+                    occupation,
+
+                status:
+                    status || "Current",
+
+                sort_order:
+                    index
+
+            });
+
+        }
+    );
+
+
+    return occupations;
+
+}
+
+
+// ============================================================
+// SAVE CHARACTER OCCUPATIONS
+// ============================================================
+
+async function saveCharacterOccupations(
+    characterId
+) {
+
+    const occupations =
+        getOccupationData();
+
+
+    // --------------------------------------------------------
+    // REMOVE EXISTING OCCUPATIONS
+    // --------------------------------------------------------
+
+    const {
+        error:
+            deleteError
+    } =
+        await supabaseClient
+            .from("character_occupations")
+            .delete()
+            .eq(
+                "character_id",
+                characterId
+            );
+
+
+    if (deleteError) {
+
+        console.error(
+            "Occupation delete error:",
+            deleteError
+        );
+
+        throw new Error(
+            "Could not update character occupations."
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // NO OCCUPATIONS
+    // --------------------------------------------------------
+
+    if (
+        occupations.length === 0
+    ) {
+
+        return;
+
+    }
+
+
+    // --------------------------------------------------------
+    // ADD OCCUPATIONS
+    // --------------------------------------------------------
+
+    const occupationRows =
+        occupations.map(
+            occupation => ({
+
+                character_id:
+                    characterId,
+
+                occupation:
+                    occupation.occupation,
+
+                status:
+                    occupation.status,
+
+                sort_order:
+                    occupation.sort_order
+
+            })
+        );
+
+
+    const {
+        error:
+            insertError
+    } =
+        await supabaseClient
+            .from("character_occupations")
+            .insert(
+                occupationRows
+            );
+
+
+    if (insertError) {
+
+        console.error(
+            "Occupation insert error:",
+            insertError
+        );
+
+        throw new Error(
+            "Could not save character occupations."
+        );
+
+    }
+
+}
 
 
 // ============================================================
@@ -2354,12 +3110,6 @@ createCharacterForm.addEventListener(
             ).value.trim() || null;
 
 
-        const occupation =
-            document.getElementById(
-                "occupation"
-            ).value.trim() || null;
-
-
         const affiliations =
             document.getElementById(
                 "affiliations"
@@ -2506,9 +3256,6 @@ createCharacterForm.addEventListener(
 
                 residence:
                     residence,
-
-                occupation:
-                    occupation,
 
                 affiliations:
                     affiliations,
@@ -2681,6 +3428,24 @@ createCharacterForm.addEventListener(
                 );
 
             }
+
+
+            // =================================================
+            // OCCUPATIONS
+            // =================================================
+
+            await saveCharacterOccupations(
+                currentCharacterId
+            );
+
+
+            // =================================================
+            // FAMILY
+            // =================================================
+
+            await saveCharacterFamily(
+                currentCharacterId
+            );
 
 
             // =================================================
@@ -2872,7 +3637,7 @@ createCharacterForm.addEventListener(
             // =================================================
 
             alert(
-                `${firstName} ${lastName} has been created!`
+                `${firstName} ${lastName} has been saved!`
             );
 
 
@@ -2889,6 +3654,52 @@ createCharacterForm.addEventListener(
 
 
             createCharacterForm.reset();
+
+
+            // Reset occupations
+            occupationsContainer.innerHTML =
+                "";
+
+
+            // Reset family
+            if (parentsContainer) {
+
+                parentsContainer.innerHTML =
+                    "";
+
+            }
+
+
+            if (siblingsContainer) {
+
+                siblingsContainer.innerHTML =
+                    "";
+
+            }
+
+
+            if (partnersContainer) {
+
+                partnersContainer.innerHTML =
+                    "";
+
+            }
+
+
+            if (childrenContainer) {
+
+                childrenContainer.innerHTML =
+                    "";
+
+            }
+
+
+            if (extendedFamilyContainer) {
+
+                extendedFamilyContainer.innerHTML =
+                    "";
+
+            }
 
 
             croppedImageBlob =

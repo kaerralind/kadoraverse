@@ -715,74 +715,242 @@
 
 
             <!-- ================================
-                 OCCUPATION
-                 ================================ -->
+     OCCUPATION
+     ================================ -->
 
-            <section class="form-section">
+<section class="form-section">
 
-                <h2>Occupation</h2>
-
-
-                <div class="form-grid">
-
-                    <div class="form-field">
-
-                        <label for="occupation">
-                            Occupation
-                        </label>
-
-                        <input
-                            type="text"
-                            id="occupation"
-                            name="occupation"
-                        >
-
-                    </div>
+    <h2>Occupation</h2>
 
 
-                    <div class="form-field">
+    <div id="occupations-container">
 
-                        <label for="affiliations">
-                            Affiliations
-                        </label>
 
-                        <input
-                            type="text"
-                            id="affiliations"
-                            name="affiliations"
-                        >
+        <!-- ============================
+             OCCUPATION #1
+             ============================ -->
 
-                    </div>
+        <div class="occupation-entry">
+
+            <div class="form-grid">
+
+                <div class="form-field">
+
+                    <label>
+                        Occupation
+                    </label>
+
+                    <input
+                        type="text"
+                        class="occupation-name"
+                        placeholder="e.g. Occupation"
+                    >
 
                 </div>
 
-            </section>
+
+                <div class="form-field">
+
+                    <label>
+                        Status
+                    </label>
+
+                    <select class="occupation-status">
+
+                        <option value="">
+                            Select Status
+                        </option>
+
+                        <option value="Current">
+                            Current
+                        </option>
+
+                        <option value="Former">
+                            Former
+                        </option>
+
+                        <option value="Occasional">
+                            Occasional
+                        </option>
+
+                        <option value="Seasonal">
+                            Seasonal
+                        </option>
+
+                        <option value="Freelance">
+                            Freelance
+                        </option>
+
+                        <option value="Contract">
+                            Contract
+                        </option>
+
+                        <option value="On Leave">
+                            On Leave
+                        </option>
+
+                        <option value="Retired">
+                            Retired
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- ============================
+         ADD OCCUPATION
+         ============================ -->
+
+    <button
+        type="button"
+        id="add-occupation"
+    >
+        + Add Occupation
+    </button>
+
+
+    <!-- ============================
+         AFFILIATIONS
+         ============================ -->
+
+    <div class="form-grid">
+
+        <div class="form-field">
+
+            <label for="affiliations">
+                Affiliations
+            </label>
+
+            <input
+                type="text"
+                id="affiliations"
+                name="affiliations"
+            >
+
+        </div>
+
+    </div>
+
+</section>
 
 
             <!-- ================================
-                FAMILY
-                ================================ -->
+     FAMILY
+     ================================ -->
 
-            <section class="form-section">
+<section class="form-section">
 
-                <h2>Family</h2>
+    <h2>Family</h2>
 
-                <div
-                    id="partner-section"
-                >
 
-                    <div id="partners-container"></div>
+    <!-- =================================
+         PARENTS
+         ================================= -->
 
-                    <button
-                        type="button"
-                        id="add-partner"
-                    >
-                        + Add Partner
-                    </button>
+    <div class="family-subsection">
 
-                </div>
+        <h3>Parents</h3>
 
-            </section>
+        <div id="parents-container"></div>
+
+        <button
+            type="button"
+            id="add-parent"
+        >
+            + Add Parent
+        </button>
+
+    </div>
+
+
+    <!-- =================================
+         SIBLINGS
+         ================================= -->
+
+    <div class="family-subsection">
+
+        <h3>Siblings</h3>
+
+        <div id="siblings-container"></div>
+
+        <button
+            type="button"
+            id="add-sibling"
+        >
+            + Add Sibling
+        </button>
+
+    </div>
+
+
+    <!-- =================================
+         PARTNERS
+         ================================= -->
+
+    <div class="family-subsection">
+
+        <h3>Partners</h3>
+
+        <div id="partners-container"></div>
+
+        <button
+            type="button"
+            id="add-partner"
+        >
+            + Add Partner
+        </button>
+
+    </div>
+
+
+    <!-- =================================
+         CHILDREN
+         ================================= -->
+
+    <div class="family-subsection">
+
+        <h3>Children</h3>
+
+        <div id="children-container"></div>
+
+        <button
+            type="button"
+            id="add-child"
+        >
+            + Add Child
+        </button>
+
+    </div>
+
+
+    <!-- =================================
+         EXTENDED FAMILY
+         ================================= -->
+
+    <div class="family-subsection">
+
+        <h3>Extended Family</h3>
+
+        <div id="extended-family-container"></div>
+
+        <button
+            type="button"
+            id="add-extended-family"
+        >
+            + Add Relative
+        </button>
+
+    </div>
+
+</section>
 
 
 
