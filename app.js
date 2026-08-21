@@ -383,9 +383,9 @@ async function saveCharacterDraft() {
 
 
     const relationshipStatusElement =
-    document.getElementById(
-        "relationship-status"
-    );
+        document.getElementById(
+            "relationship-status"
+        );
 
     const relationshipStatus =
         relationshipStatusElement
@@ -393,15 +393,14 @@ async function saveCharacterDraft() {
             : null;
 
 
-    const profileDumpElement =
+    const profileElement =
         document.getElementById(
-            "profile-dump"
+            "profile"
         );
 
-
     const profileDump =
-        profileDumpElement
-            ? profileDumpElement.value.trim() || null
+        profileElement
+            ? profileElement.value.trim() || null
             : null;
 
 
@@ -3122,9 +3121,7 @@ createCharacterForm.addEventListener(
 
 
         const relationshipStatusElement =
-            document.getElementById(
-                "relationship-status"
-            );
+            document.getElementById("relationship-status");
 
         const relationshipStatus =
             relationshipStatusElement
@@ -3132,15 +3129,12 @@ createCharacterForm.addEventListener(
                 : null;
 
 
-        const profileDumpElement =
-            document.getElementById(
-                "profile-dump"
-            );
-
+        const profileElement =
+            document.getElementById("profile");
 
         const profileDump =
-            profileDumpElement
-                ? profileDumpElement.value.trim() || null
+            profileElement
+                ? profileElement.value.trim() || null
                 : null;
 
 
