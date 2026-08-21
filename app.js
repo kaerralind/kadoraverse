@@ -18,37 +18,70 @@ const app = document.getElementById("app");
 const logoutButton = document.getElementById("logout-button");
 
 // Character navigation
-const createCharacterButton = document.getElementById("create-character-button");
-const createCharacterPage = document.getElementById("create-character-page");
-const backToVaultButton = document.getElementById("back-to-vault");
-const cancelCharacterButton = document.getElementById("cancel-character");
-const createCharacterForm = document.getElementById("create-character-form");
+const createCharacterButton =
+    document.getElementById("create-character-button");
+
+const createCharacterPage =
+    document.getElementById("create-character-page");
+
+const backToVaultButton =
+    document.getElementById("back-to-vault");
+
+const cancelCharacterButton =
+    document.getElementById("cancel-character");
+
+const createCharacterForm =
+    document.getElementById("create-character-form");
 
 // Relationship / partner elements
-const partnerSection = document.getElementById("partner-section");
-const partnersContainer = document.getElementById("partners-container");
-const addPartnerButton = document.getElementById("add-partner");
+const partnerSection =
+    document.getElementById("partner-section");
+
+const partnersContainer =
+    document.getElementById("partners-container");
+
+const addPartnerButton =
+    document.getElementById("add-partner");
 
 // Character image
-const profileImageInput = document.getElementById("profile-image");
-const imagePreview = document.getElementById("image-preview");
-const removeImageButton = document.getElementById("remove-image");
+const profileImageInput =
+    document.getElementById("profile-image");
+
+const imagePreview =
+    document.getElementById("image-preview");
+
+const removeImageButton =
+    document.getElementById("remove-image");
 
 // Gender
-const genderSelect = document.getElementById("gender");
-const genderSymbol = document.getElementById("gender-symbol");
+const genderSelect =
+    document.getElementById("gender");
+
+const genderSymbol =
+    document.getElementById("gender-symbol");
 
 // Cropper
-const cropperModal = document.getElementById("image-cropper-modal");
-const cropperImage = document.getElementById("cropper-image");
-const cropperZoom = document.getElementById("cropper-zoom");
-const cropperCancel = document.getElementById("cropper-cancel");
-const cropperReset = document.getElementById("cropper-reset");
-const cropperApply = document.getElementById("cropper-apply");
+const cropperModal =
+    document.getElementById("image-cropper-modal");
+
+const cropperImage =
+    document.getElementById("cropper-image");
+
+const cropperZoom =
+    document.getElementById("cropper-zoom");
+
+const cropperCancel =
+    document.getElementById("cropper-cancel");
+
+const cropperReset =
+    document.getElementById("cropper-reset");
+
+const cropperApply =
+    document.getElementById("cropper-apply");
 
 
 // ------------------------------------------------------------
-// CROPPER / DRAFT STATE
+// DRAFT / CROPPER STATE
 // ------------------------------------------------------------
 
 let cropper = null;
@@ -59,8 +92,13 @@ let currentCharacterId = null;
 let autosaveInterval = null;
 
 
-// ------------------------------------------------------------
+// ============================================================
 // SHOW / HIDE APPLICATION
+// ============================================================
+
+
+// ------------------------------------------------------------
+// SHOW APPLICATION
 // ------------------------------------------------------------
 
 function showApp() {
@@ -143,12 +181,11 @@ function showVault() {
 
 
 // ------------------------------------------------------------
-// START CHARACTER DRAFT AUTOSAVE
+// START AUTOSAVE
 // ------------------------------------------------------------
 
 function startCharacterDraftAutosave() {
 
-    // Prevent duplicate timers
     if (autosaveInterval) {
 
         clearInterval(
@@ -157,7 +194,6 @@ function startCharacterDraftAutosave() {
 
     }
 
-    // Autosave every 30 seconds
     autosaveInterval =
         setInterval(
             saveCharacterDraft,
@@ -172,7 +208,7 @@ function startCharacterDraftAutosave() {
 
 
 // ------------------------------------------------------------
-// STOP CHARACTER DRAFT AUTOSAVE
+// STOP AUTOSAVE
 // ------------------------------------------------------------
 
 function stopCharacterDraftAutosave() {
@@ -200,7 +236,7 @@ function stopCharacterDraftAutosave() {
 
 async function saveCharacterDraft() {
 
-    // Don't autosave if the creation page isn't visible
+    // Don't autosave when the creation page is hidden
     if (
         createCharacterPage.style.display === "none"
     ) {
@@ -211,7 +247,7 @@ async function saveCharacterDraft() {
 
 
     // --------------------------------------------------------
-    // GET REQUIRED NAME FIELDS
+    // REQUIRED NAME FIELDS
     // --------------------------------------------------------
 
     const firstName =
@@ -225,8 +261,11 @@ async function saveCharacterDraft() {
         ).value.trim();
 
 
-    // Don't create a database row until we have a name
-    if (!firstName || !lastName) {
+    // Don't create a database row without a name
+    if (
+        !firstName ||
+        !lastName
+    ) {
 
         console.log(
             "Draft autosave skipped: first and last name are required."
@@ -238,7 +277,7 @@ async function saveCharacterDraft() {
 
 
     // --------------------------------------------------------
-    // GET FORM VALUES
+    // FORM VALUES
     // --------------------------------------------------------
 
     const displayName =
@@ -268,6 +307,12 @@ async function saveCharacterDraft() {
     const height =
         document.getElementById(
             "height"
+        ).value.trim() || null;
+
+
+    const penisSize =
+        document.getElementById(
+            "penis-size"
         ).value.trim() || null;
 
 
@@ -337,6 +382,18 @@ async function saveCharacterDraft() {
         ).value.trim() || null;
 
 
+    const profileDumpElement =
+        document.getElementById(
+            "profile-dump"
+        );
+
+
+    const profileDump =
+        profileDumpElement
+            ? profileDumpElement.value.trim() || null
+            : null;
+
+
     // --------------------------------------------------------
     // BUILD DATE OF BIRTH
     // --------------------------------------------------------
@@ -351,13 +408,18 @@ async function saveCharacterDraft() {
     ) {
 
         const month =
-            String(birthMonth).padStart(
+            String(
+                birthMonth
+            ).padStart(
                 2,
                 "0"
             );
 
+
         const day =
-            String(birthDay).padStart(
+            String(
+                birthDay
+            ).padStart(
                 2,
                 "0"
             );
@@ -370,44 +432,80 @@ async function saveCharacterDraft() {
 
 
     // --------------------------------------------------------
-    // BUILD CHARACTER DATA
+    // CALCULATE AGE
+    // --------------------------------------------------------
+
+    const age =
+        calculateAge(
+            dateOfBirth
+        );
+
+
+    // --------------------------------------------------------
+    // CHARACTER DATA
     // --------------------------------------------------------
 
     const characterData = {
 
-        first_name: firstName,
+        first_name:
+            firstName,
 
-        last_name: lastName,
+        last_name:
+            lastName,
 
-        display_name: displayName,
+        display_name:
+            displayName,
 
-        aliases: aliases,
+        aliases:
+            aliases,
 
-        gender: gender,
+        gender:
+            gender,
 
-        species: species,
+        species:
+            species,
 
-        height: height,
+        height:
+            height,
 
-        hair_color: hairColor,
+        penis_size:
+            penisSize,
 
-        eye_color: eyeColor,
+        hair_color:
+            hairColor,
 
-        date_of_birth: dateOfBirth,
+        eye_color:
+            eyeColor,
 
-        zodiac_sign: zodiacSign,
+        date_of_birth:
+            dateOfBirth,
 
-        birth_place: birthPlace,
+        age:
+            age,
 
-        residence: residence,
+        zodiac_sign:
+            zodiacSign,
 
-        occupation: occupation,
+        birth_place:
+            birthPlace,
 
-        affiliations: affiliations,
+        residence:
+            residence,
 
-        marital_status: maritalStatus,
+        occupation:
+            occupation,
 
-        profile_status: "draft"
+        affiliations:
+            affiliations,
+
+        marital_status:
+            maritalStatus,
+
+        profile_dump:
+            profileDump,
+
+        profile_status:
+            "draft"
 
     };
 
@@ -424,7 +522,9 @@ async function saveCharacterDraft() {
                 error
             } = await supabaseClient
                 .from("characters")
-                .update(characterData)
+                .update(
+                    characterData
+                )
                 .eq(
                     "id",
                     currentCharacterId
@@ -479,10 +579,6 @@ async function saveCharacterDraft() {
 
         }
 
-
-        // Store the database ID.
-        // Every future autosave will UPDATE
-        // this same row.
 
         currentCharacterId =
             data.id;
@@ -563,7 +659,6 @@ async function checkLogin() {
 
         }
 
-
     } else {
 
         console.log(
@@ -608,9 +703,11 @@ loginForm.addEventListener(
         } =
             await supabaseClient.auth.signInWithPassword({
 
-                email: email,
+                email:
+                    email,
 
-                password: password
+                password:
+                    password
 
             });
 
@@ -668,14 +765,13 @@ logoutButton.addEventListener(
         }
 
 
-        // Forget the current page
         localStorage.removeItem(
             "kadoraverse_current_page"
         );
 
 
-        // Reset draft state
-        currentCharacterId = null;
+        currentCharacterId =
+            null;
 
 
         showLogin();
@@ -697,8 +793,8 @@ createCharacterButton.addEventListener(
     "click",
     function() {
 
-        // Start a fresh character
-        currentCharacterId = null;
+        currentCharacterId =
+            null;
 
         showCreateCharacter();
 
@@ -758,7 +854,6 @@ profileImageInput.addEventListener(
         }
 
 
-        // Make sure the selected file is an image
         if (
             !file.type.startsWith(
                 "image/"
@@ -769,14 +864,14 @@ profileImageInput.addEventListener(
                 "Please select an image file."
             );
 
-            profileImageInput.value = "";
+            profileImageInput.value =
+                "";
 
             return;
 
         }
 
 
-        // Clean up an old object URL
         if (selectedImageURL) {
 
             URL.revokeObjectURL(
@@ -792,32 +887,28 @@ profileImageInput.addEventListener(
             );
 
 
-        // Put the image into the cropper
         cropperImage.src =
             selectedImageURL;
 
 
-        // Show cropper
         cropperModal.style.display =
             "flex";
 
 
-        // Reset zoom
         cropperZoom.value =
             "1";
 
 
-        // Destroy previous Cropper instance
         if (cropper) {
 
             cropper.destroy();
 
-            cropper = null;
+            cropper =
+                null;
 
         }
 
 
-        // Wait for image to load
         cropperImage.onload =
             function() {
 
@@ -974,9 +1065,11 @@ cropperApply.addEventListener(
         const canvas =
             cropper.getCroppedCanvas({
 
-                width: 600,
+                width:
+                    600,
 
-                height: 800,
+                height:
+                    800,
 
                 imageSmoothingEnabled:
                     true,
@@ -1046,7 +1139,6 @@ cropperApply.addEventListener(
         );
 
 
-        // Show remove button
         removeImageButton.style.display =
             "inline-block";
 
@@ -1071,7 +1163,8 @@ function closeCropper() {
 
         cropper.destroy();
 
-        cropper = null;
+        cropper =
+            null;
 
     }
 
@@ -1134,25 +1227,394 @@ removeImageButton.addEventListener(
 // ------------------------------------------------------------
 // GENDER SYMBOLS
 // ------------------------------------------------------------
+//
+// These are DISPLAY ONLY.
+// They are NOT saved to Supabase.
+// The gender itself is saved.
+// ------------------------------------------------------------
 
 const genderSymbols = {
 
-    Alpha: "α",
+    Alpha:
+        "α",
 
-    Sigma: "Σ",
+    Sigma:
+        "Σ",
 
-    Beta: "β",
+    Beta:
+        "β",
 
-    Zeta: "ζ",
+    Zeta:
+        "ζ",
 
-    Omega: "ω",
+    Omega:
+        "ω",
 
-    Omicron: "ο",
+    Omicron:
+        "ο",
 
-    Tau: "τ"
+    Tau:
+        "τ"
 
 };
 
+
+// ------------------------------------------------------------
+// SCENTS
+// ------------------------------------------------------------
+
+const alphaSigmaScents = {
+
+    "Marine / Fresh": [
+        "Citrus",
+        "Coconut",
+        "Saltwater",
+        "Sea Breeze"
+    ],
+
+    "Woods / Forest": [
+        "Cedar",
+        "Driftwood",
+        "Juniper Wood",
+        "Moss",
+        "Oakwood",
+        "Pine",
+        "Sandalwood"
+    ],
+
+    "Animalic / Natural": [
+        "Allspice",
+        "Bay Leaf",
+        "Black Pepper",
+        "Clove",
+        "Coriander Seed",
+        "Cumin Seed",
+        "Musk",
+        "Pepper",
+        "Smokiness",
+        "Star Anise",
+        "Tanned Leather"
+    ],
+
+    "Earth / Weather": [
+        "Ozone",
+        "Petrichor",
+        "Winter Breeze"
+    ],
+
+    "Herbal": [
+        "Basil",
+        "Cedar Leaf",
+        "Eucalyptus",
+        "Laurel Leaf",
+        "Marjoram",
+        "Mint",
+        "Oregano",
+        "Pine Needle",
+        "Rosemary",
+        "Sage",
+        "Tarragon",
+        "Thyme"
+    ],
+
+    "Nutty": [
+        "Almond",
+        "Chestnut",
+        "Hazelnut",
+        "Walnut"
+    ],
+
+    "Metallic / Mineral": [
+        "Iron",
+        "Metallic",
+        "Steel"
+    ],
+
+    "Resin / Wood Smoke": [
+        "Amber",
+        "Burning Cedar",
+        "Cedar Tar",
+        "Charred Wood",
+        "Guaiac Wood",
+        "Pine Tar"
+    ],
+
+    "Stone / Earth": [
+        "Chalk",
+        "Clay",
+        "Dry Earth",
+        "Dust",
+        "Forest Floor",
+        "Granite Dust",
+        "Limestone",
+        "Loam",
+        "River Rock",
+        "Root-Rich Soil",
+        "Sand",
+        "Sandstone",
+        "Slate",
+        "Volcanic Ash",
+        "Wet Stone"
+    ],
+
+    "Cold / Atmospheric": [
+        "Alpine Chill",
+        "Campfire",
+        "Charcoal",
+        "Fireplace Ash",
+        "Fresh Asphalt",
+        "Fresh-cut Grass",
+        "Frost",
+        "Gunpowder",
+        "Snowmelt"
+    ],
+
+    "Bitter / Green": [
+        "Bitter Greens",
+        "Crushed Stems",
+        "Juniper",
+        "Wormwood"
+    ],
+
+    "Resinous Wood": [
+        "Balsam",
+        "Fir Resin",
+        "Maple Sap",
+        "Sweet Birch"
+    ],
+
+    "Plants / Bark / Root": [
+        "Bark Shavings",
+        "Dried Hay",
+        "Oakmoss",
+        "Tobacco Leaf",
+        "Tree Sap"
+    ]
+
+};
+
+
+const omegaZetaScents = {
+
+    "Floral": [
+        "Apple Blossom",
+        "Chamomile",
+        "Clover Blossom",
+        "Freesia",
+        "Gardenia",
+        "Heather",
+        "Heliotrope",
+        "Hibiscus",
+        "Honeysuckle",
+        "Iris",
+        "Jasmine",
+        "Lilac",
+        "Lily",
+        "Lily of the Valley",
+        "Lotus",
+        "Magnolia",
+        "Mimosa",
+        "Orange Blossom",
+        "Orchid",
+        "Osmanthus",
+        "Peony",
+        "Plumeria",
+        "Rose",
+        "Sweet Pea",
+        "Violet",
+        "Water Lily",
+        "Wildflowers",
+        "Wisteria"
+    ],
+
+    "Fruity": [
+        "Apple Blossom",
+        "Apricot",
+        "Blackberry",
+        "Blueberry",
+        "Citrus",
+        "Fig",
+        "Guava",
+        "Mango",
+        "Melon",
+        "Passionfruit",
+        "Peach",
+        "Pear",
+        "Pineapple",
+        "Plum",
+        "Raspberry",
+        "Ripe Berries",
+        "Strawberry",
+        "Tropical Fruit",
+        "White Grape"
+    ],
+
+    "Sweet / Nectarous": [
+        "Acacia Blossom",
+        "Agave",
+        "Brown Sugar",
+        "Elderflower",
+        "Golden Honey",
+        "Honey",
+        "Honeysuckle Nectar",
+        "Linden Blossom",
+        "Maple Syrup",
+        "Pollen-Sweet Bloom"
+    ],
+
+    "Gourmand": [
+        "Angel Food Cake",
+        "Brown Butter",
+        "Caramel",
+        "Chocolate",
+        "Condensed Milk",
+        "Cream Puff",
+        "Macadamia",
+        "Marshmallow",
+        "Meringue",
+        "Oat Cream",
+        "Pecan",
+        "Pistachio",
+        "Rice Milk",
+        "Shortbread",
+        "Spun Sugar",
+        "Steamed Rice",
+        "Sweet Cream",
+        "Toasted Sugar",
+        "Vanilla",
+        "Warm Milk"
+    ],
+
+    "Spices": [
+        "Cardamom",
+        "Cinnamon",
+        "Nutmeg"
+    ],
+
+    "Herbal": [
+        "Aloe Vera",
+        "Green Tea",
+        "Lemongrass",
+        "Spearmint",
+        "Verbena",
+        "White Tea"
+    ],
+
+    "Plant-Based": [
+        "Damp Leaves",
+        "Fresh Hay",
+        "Fresh Soil",
+        "Mossy Green",
+        "Rice Husk",
+        "Sweetgrass",
+        "Wheatgrass"
+    ]
+
+};
+
+
+const scentGroups = {
+
+    Alpha:
+        alphaSigmaScents,
+
+    Sigma:
+        alphaSigmaScents,
+
+    Omega:
+        omegaZetaScents,
+
+    Zeta:
+        omegaZetaScents
+
+};
+
+
+// ------------------------------------------------------------
+// SCENT SELECTOR
+// ------------------------------------------------------------
+
+const scentSelect =
+    document.getElementById(
+        "scent"
+    );
+
+
+function populateScentDropdown(gender) {
+
+    scentSelect.innerHTML =
+        '<option value="">Select Scent</option>';
+
+
+    const groups =
+        scentGroups[gender];
+
+
+    if (!groups) {
+
+        scentSelect.disabled =
+            true;
+
+        return;
+
+    }
+
+
+    Object.entries(groups).forEach(
+        ([category, scents]) => {
+
+            const optgroup =
+                document.createElement(
+                    "optgroup"
+                );
+
+
+            optgroup.label =
+                category;
+
+
+            scents.forEach(
+                scent => {
+
+                    const option =
+                        document.createElement(
+                            "option"
+                        );
+
+
+                    option.value =
+                        scent;
+
+
+                    option.textContent =
+                        scent;
+
+
+                    optgroup.appendChild(
+                        option
+                    );
+
+                }
+            );
+
+
+            scentSelect.appendChild(
+                optgroup
+            );
+
+        }
+    );
+
+
+    scentSelect.disabled =
+        false;
+
+}
+
+
+// ------------------------------------------------------------
+// GENDER CHANGE
+// ------------------------------------------------------------
 
 genderSelect.addEventListener(
     "change",
@@ -1162,38 +1624,477 @@ genderSelect.addEventListener(
             this.value;
 
 
+        // Display only
         genderSymbol.textContent =
-            genderSymbols[
-                selectedGender
-            ] || "—";
+            genderSymbols[selectedGender] ||
+            "—";
+
+
+        populateScentDropdown(
+            selectedGender
+        );
 
     }
 );
 
+
+// ============================================================
+// AGE CALCULATION
+// ============================================================
+
+function calculateAge(dateOfBirth) {
+
+    if (!dateOfBirth) {
+
+        return null;
+
+    }
+
+
+    const birthDate =
+        new Date(
+            `${dateOfBirth}T00:00:00`
+        );
+
+
+    if (
+        Number.isNaN(
+            birthDate.getTime()
+        )
+    ) {
+
+        return null;
+
+    }
+
+
+    const today =
+        new Date();
+
+
+    let age =
+        today.getFullYear() -
+        birthDate.getFullYear();
+
+
+    const monthDifference =
+        today.getMonth() -
+        birthDate.getMonth();
+
+
+    if (
+        monthDifference < 0 ||
+        (
+            monthDifference === 0 &&
+            today.getDate() <
+            birthDate.getDate()
+        )
+    ) {
+
+        age--;
+
+    }
+
+
+    return age;
+
+}
+
+
+// ============================================================
+// ZODIAC SIGN
+// ============================================================
+
+function getZodiacSign(month, day) {
+
+    month =
+        parseInt(
+            month
+        );
+
+
+    day =
+        parseInt(
+            day
+        );
+
+
+    if (
+        !month ||
+        !day
+    ) {
+
+        return "";
+
+    }
+
+
+    if (
+        (month === 3 && day >= 21) ||
+        (month === 4 && day <= 19)
+    ) {
+
+        return "Aries";
+
+    }
+
+
+    if (
+        (month === 4 && day >= 20) ||
+        (month === 5 && day <= 20)
+    ) {
+
+        return "Taurus";
+
+    }
+
+
+    if (
+        (month === 5 && day >= 21) ||
+        (month === 6 && day <= 20)
+    ) {
+
+        return "Gemini";
+
+    }
+
+
+    if (
+        (month === 6 && day >= 21) ||
+        (month === 7 && day <= 22)
+    ) {
+
+        return "Cancer";
+
+    }
+
+
+    if (
+        (month === 7 && day >= 23) ||
+        (month === 8 && day <= 22)
+    ) {
+
+        return "Leo";
+
+    }
+
+
+    if (
+        (month === 8 && day >= 23) ||
+        (month === 9 && day <= 22)
+    ) {
+
+        return "Virgo";
+
+    }
+
+
+    if (
+        (month === 9 && day >= 23) ||
+        (month === 10 && day <= 22)
+    ) {
+
+        return "Libra";
+
+    }
+
+
+    if (
+        (month === 10 && day >= 23) ||
+        (month === 11 && day <= 21)
+    ) {
+
+        return "Scorpio";
+
+    }
+
+
+    if (
+        (month === 11 && day >= 22) ||
+        (month === 12 && day <= 21)
+    ) {
+
+        return "Sagittarius";
+
+    }
+
+
+    if (
+        (month === 12 && day >= 22) ||
+        (month === 1 && day <= 19)
+    ) {
+
+        return "Capricorn";
+
+    }
+
+
+    if (
+        (month === 1 && day >= 20) ||
+        (month === 2 && day <= 18)
+    ) {
+
+        return "Aquarius";
+
+    }
+
+
+    if (
+        (month === 2 && day >= 19) ||
+        (month === 3 && day <= 20)
+    ) {
+
+        return "Pisces";
+
+    }
+
+
+    return "";
+
+}
+
+
+// ============================================================
+// BIRTH DATE / ZODIAC
+// ============================================================
+
+const birthMonthInput =
+    document.getElementById(
+        "birth-month"
+    );
+
+
+const birthDayInput =
+    document.getElementById(
+        "birth-day"
+    );
+
+
+const birthYearInput =
+    document.getElementById(
+        "birth-year"
+    );
+
+
+const zodiacSignInput =
+    document.getElementById(
+        "zodiac-sign"
+    );
+
+
 // ------------------------------------------------------------
-// CHARACTER RELATIONSHIPS
+// UPDATE AVAILABLE DAYS
 // ------------------------------------------------------------
 
+function updateBirthDays() {
+
+    const month =
+        parseInt(
+            birthMonthInput.value
+        );
+
+
+    const year =
+        parseInt(
+            birthYearInput.value
+        );
+
+
+    const currentDay =
+        birthDayInput.value;
+
+
+    let daysInMonth =
+        31;
+
+
+    if (month) {
+
+        if (
+            month === 2
+        ) {
+
+            if (
+                year &&
+                (
+                    year % 400 === 0 ||
+                    (
+                        year % 4 === 0 &&
+                        year % 100 !== 0
+                    )
+                )
+            ) {
+
+                daysInMonth =
+                    29;
+
+            } else {
+
+                daysInMonth =
+                    28;
+
+            }
+
+        } else if (
+            [4, 6, 9, 11].includes(
+                month
+            )
+        ) {
+
+            daysInMonth =
+                30;
+
+        }
+
+    }
+
+
+    birthDayInput.innerHTML =
+        '<option value="">Day</option>';
+
+
+    for (
+        let day = 1;
+        day <= daysInMonth;
+        day++
+    ) {
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+
+        option.value =
+            day;
+
+
+        option.textContent =
+            day;
+
+
+        birthDayInput.appendChild(
+            option
+        );
+
+    }
+
+
+    if (
+        currentDay &&
+        parseInt(
+            currentDay
+        ) <= daysInMonth
+    ) {
+
+        birthDayInput.value =
+            currentDay;
+
+    }
+
+}
+
+
+// ------------------------------------------------------------
+// UPDATE ZODIAC
+// ------------------------------------------------------------
+
+function updateZodiacSign() {
+
+    const zodiacSign =
+        getZodiacSign(
+            birthMonthInput.value,
+            birthDayInput.value
+        );
+
+
+    zodiacSignInput.value =
+        zodiacSign;
+
+}
+
+
+// ------------------------------------------------------------
+// BIRTH MONTH CHANGE
+// ------------------------------------------------------------
+
+birthMonthInput.addEventListener(
+    "change",
+    function() {
+
+        updateBirthDays();
+
+        updateZodiacSign();
+
+    }
+);
+
+
+// ------------------------------------------------------------
+// BIRTH DAY CHANGE
+// ------------------------------------------------------------
+
+birthDayInput.addEventListener(
+    "change",
+    function() {
+
+        updateZodiacSign();
+
+    }
+);
+
+
+// ------------------------------------------------------------
+// BIRTH YEAR CHANGE
+// ------------------------------------------------------------
+
+birthYearInput.addEventListener(
+    "input",
+    function() {
+
+        updateBirthDays();
+
+        updateZodiacSign();
+
+    }
+);
+
+
+// ============================================================
+// CHARACTER RELATIONSHIPS
+// ============================================================
+
 const partnerRelationshipStatuses = [
+
     "Dating",
+
     "Engaged",
+
     "Married",
+
     "Mated",
+
     "Separated",
+
     "Divorced",
+
     "Widowed",
+
     "Open Relationship",
+
     "It's Complicated"
+
 ];
 
 
 // ------------------------------------------------------------
-// SHOW / HIDE PARTNER SECTION
+// SHOW PARTNER SECTION
 // ------------------------------------------------------------
 
 function updatePartnerSectionVisibility() {
 
-    partnerSection.style.display = "block";
+    partnerSection.style.display =
+        "block";
 
 }
 
@@ -1205,7 +2106,10 @@ function updatePartnerSectionVisibility() {
 function addPartner() {
 
     const partnerEntry =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     partnerEntry.className =
         "partner-entry";
@@ -1302,6 +2206,7 @@ addPartnerButton.addEventListener(
     }
 );
 
+
 // ============================================================
 // CREATE / SAVE CHARACTER
 // ============================================================
@@ -1329,7 +2234,7 @@ createCharacterForm.addEventListener(
 
 
         // ----------------------------------------------------
-        // GET BASIC IDENTITY
+        // BASIC IDENTITY
         // ----------------------------------------------------
 
         const firstName =
@@ -1362,7 +2267,7 @@ createCharacterForm.addEventListener(
 
 
         // ----------------------------------------------------
-        // GET ALL FORM VALUES
+        // FORM VALUES
         // ----------------------------------------------------
 
         const displayName =
@@ -1392,6 +2297,12 @@ createCharacterForm.addEventListener(
         const height =
             document.getElementById(
                 "height"
+            ).value.trim() || null;
+
+
+        const penisSize =
+            document.getElementById(
+                "penis-size"
             ).value.trim() || null;
 
 
@@ -1461,11 +2372,24 @@ createCharacterForm.addEventListener(
             ).value.trim() || null;
 
 
+        const profileDumpElement =
+            document.getElementById(
+                "profile-dump"
+            );
+
+
+        const profileDump =
+            profileDumpElement
+                ? profileDumpElement.value.trim() || null
+                : null;
+
+
         // ----------------------------------------------------
         // BUILD DATE OF BIRTH
         // ----------------------------------------------------
 
-        let dateOfBirth = null;
+        let dateOfBirth =
+            null;
 
 
         if (
@@ -1496,6 +2420,16 @@ createCharacterForm.addEventListener(
                 `${birthYear}-${month}-${day}`;
 
         }
+
+
+        // ----------------------------------------------------
+        // CALCULATE AGE
+        // ----------------------------------------------------
+
+        const age =
+            calculateAge(
+                dateOfBirth
+            );
 
 
         // ----------------------------------------------------
@@ -1549,6 +2483,9 @@ createCharacterForm.addEventListener(
                 height:
                     height,
 
+                penis_size:
+                    penisSize,
+
                 hair_color:
                     hairColor,
 
@@ -1557,6 +2494,9 @@ createCharacterForm.addEventListener(
 
                 date_of_birth:
                     dateOfBirth,
+
+                age:
+                    age,
 
                 zodiac_sign:
                     zodiacSign,
@@ -1576,6 +2516,9 @@ createCharacterForm.addEventListener(
                 marital_status:
                     maritalStatus,
 
+                profile_dump:
+                    profileDump,
+
                 profile_status:
                     "draft"
 
@@ -1583,13 +2526,14 @@ createCharacterForm.addEventListener(
 
 
             // =================================================
-            // 1. HANDLE EXISTING AUTOSAVED DRAFT
+            // EXISTING AUTOSAVED DRAFT
             // =================================================
 
             if (currentCharacterId) {
 
                 const {
-                    data: updatedCharacter,
+                    data:
+                        updatedCharacter,
                     error:
                         characterUpdateError
                 } =
@@ -1631,12 +2575,7 @@ createCharacterForm.addEventListener(
 
 
             // =================================================
-            // 2. CHECK FOR EXISTING CHARACTER
-            // =================================================
-            //
-            // Only perform the duplicate-name check when
-            // there is NOT already an autosaved draft.
-            //
+            // NEW CHARACTER
             // =================================================
 
             else {
@@ -1688,12 +2627,9 @@ createCharacterForm.addEventListener(
                 }
 
 
-                // ---------------------------------------------
-                // CREATE CHARACTER
-                // ---------------------------------------------
-
                 const {
-                    data: newCharacter,
+                    data:
+                        newCharacter,
                     error:
                         characterInsertError
                 } =
@@ -1748,12 +2684,7 @@ createCharacterForm.addEventListener(
 
 
             // =================================================
-            // 3. PROFILE IMAGE
-            // =================================================
-            //
-            // Images are uploaded after the character exists
-            // so we have the character ID available.
-            //
+            // PROFILE IMAGE
             // =================================================
 
             if (
@@ -1769,11 +2700,12 @@ createCharacterForm.addEventListener(
 
 
                 // ---------------------------------------------
-                // Check whether exact filename already exists
+                // CHECK EXISTING IMAGE
                 // ---------------------------------------------
 
                 const {
-                    data: existingFiles,
+                    data:
+                        existingFiles,
                     error:
                         fileCheckError
                 } =
@@ -1828,7 +2760,7 @@ createCharacterForm.addEventListener(
 
 
                 // ---------------------------------------------
-                // Upload image
+                // UPLOAD IMAGE
                 // ---------------------------------------------
 
                 const {
@@ -1844,11 +2776,13 @@ createCharacterForm.addEventListener(
                             imagePath,
                             croppedImageBlob,
                             {
+
                                 contentType:
                                     "image/png",
 
                                 upsert:
                                     false
+
                             }
                         );
 
@@ -1870,7 +2804,7 @@ createCharacterForm.addEventListener(
 
 
                 // ---------------------------------------------
-                // Get public image URL
+                // GET PUBLIC URL
                 // ---------------------------------------------
 
                 const {
@@ -1892,7 +2826,7 @@ createCharacterForm.addEventListener(
 
 
                 // ---------------------------------------------
-                // Save image URL to character
+                // SAVE IMAGE URL
                 // ---------------------------------------------
 
                 const {
@@ -1934,7 +2868,7 @@ createCharacterForm.addEventListener(
 
 
             // =================================================
-            // 4. SUCCESS
+            // SUCCESS
             // =================================================
 
             alert(
@@ -1947,16 +2881,13 @@ createCharacterForm.addEventListener(
             );
 
 
-            // Stop autosave
             stopCharacterDraftAutosave();
 
 
-            // Reset draft ID
             currentCharacterId =
                 null;
 
 
-            // Reset form
             createCharacterForm.reset();
 
 
@@ -1976,12 +2907,20 @@ createCharacterForm.addEventListener(
                 "";
 
 
-            // Reset gender symbol
             genderSymbol.textContent =
                 "—";
 
 
-            // Return to Character Vault
+            // Clear scent selector
+            scentSelect.innerHTML =
+                '<option value="">Select Scent</option>';
+
+
+            scentSelect.disabled =
+                true;
+
+
+            // Return to vault
             showVault();
 
 
