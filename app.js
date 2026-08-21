@@ -3416,9 +3416,9 @@ createCharacterForm.addEventListener(
 
 
                     throw new Error(
+                        characterInsertError.message ||
                         "The character could not be created."
                     );
-
                 }
 
 
